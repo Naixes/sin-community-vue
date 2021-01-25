@@ -248,6 +248,260 @@ Web服务：Nginx+HTTPS/Caddy，RESTful API，WebSocket（消息）
 
 运行环境：Docker/自定义Dockerfile/私有仓库Harbor
 
+## 环境搭建
+
+### 开发环境搭建
+
+**准备三个环境**
+
+本地环境：nodejs，IDE，vue-cli
+
+测试环境：Linux环境（三选一：虚拟机，云服务1c+2G，安装Docker）
+
+数据库服务：Mongodb
+
+#### 简版
+
+##### 本地环境
+
+**Nodejs12.16.3（npm6.14.4/yarn1.22.10）+nvm0.37.2**
+
+yarn：安装参考官方仓库
+
+nvm：mac使用nvm，win使用nvm-windows，安装参考官方仓库`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash`
+
+> 安装报错：Failed to connect to raw.githubusercontent.com port 443: Connection refused
+>
+> 解决：点击如下网址`https://www.ipaddress.com/`来查询raw.githubusercontent.com的真实ip，然后在用sudo vim /etc/hosts修改hosts`199.232.28.133 raw.githubusercontent.com`不成功的话试试151.101.76.133
+>
+> 再次安装后报：
+>
+> Resolving deltas: 100% (38/38), done.
+>
+> => Compressing and cleaning up git repository
+>
+> 
+>
+> => Profile not found. Tried ~/.bashrc, ~/.bash_profile, ~/.zshrc, and ~/.profile.
+>
+> => Create one of them and run this script again
+>
+>   OR
+>
+> => Append the following lines to the correct file yourself:
+>
+> 
+>
+> export NVM_DIR="$HOME/.nvm"
+>
+> [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+>
+> 
+>
+> npm ERR! peer dep missing: vue@3.0.5, required by @vue/compiler-sfc@3.0.5
+>
+> => You currently have modules installed globally with `npm`. These will no
+>
+> => longer be linked to the active version of Node when you install a new node
+>
+> => with `nvm`; and they may (depending on how you construct your `$PATH`)
+>
+> => override the binaries of modules installed with `nvm`:
+>
+> 
+>
+> /usr/local/lib
+>
+> ├── @vue/cli@4.5.11
+>
+> ├── create-react-app@3.4.1
+>
+> ├── typescript@4.1.3
+>
+> └── yarn@1.22.10
+>
+> => If you wish to uninstall them at a later point (or re-install them under your
+>
+> => `nvm` Nodes), you can remove them from the system Node as follows:
+>
+> 
+>
+>    $ nvm use system
+>
+>    $ npm uninstall -g a_module
+>
+> 
+>
+> => Close and reopen your terminal to start using nvm or run the following to use it now:
+>
+> 
+>
+> export NVM_DIR="$HOME/.nvm"
+>
+> [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+>
+> 解决：
+>
+> 1、cd ~ ( 进入当前用户的home目录)
+>
+> 2、open .bash_profile (打开.bash_profile文件，如果文件不存在就 创建文件：touch .bash_profile 编辑文件：open -e .bash_profile)
+>
+> 3、直接更改弹出的.bash_profile文件内容,把以下内容粘贴进去（添加环境变量）：
+>
+> ```
+> export NVM_DIR="$HOME/.nvm"
+> [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+> ```
+>
+> 4、command + s 保存文件，然后关闭 。
+>
+> 5、在terminal(终端)中输入 source .bash_profile (使用刚才更新之后的内容)。
+>
+> 6、nvm --version
+>
+> 7、0.37.2～成功～
+
+```cmd
+nvm list
+nvm use xxx
+```
+
+**IDE（vscode，webstorm，atom）**
+
+**Vue-Cli**
+
+安装：npm i -g @vue/cli
+
+快速原型开发：npm i -g @vue/cli-service-global（未安装，需要时再安装，比如vue serve不能运行vue文件）
+
+##### 测试环境及mongo数据库环境
+
+三种方式：
+
+- 虚拟机自建环境（Parallels/Vmware/Hyperv）
+
+- 云服务（一核2G以上）
+
+- 安装Docker（轻量容器服务）
+
+  在Linux安装参考docker-install仓库
+
+  其他环境参考官网
+
+  - docker集合命令工具：docker compose，安装参考官网（安装，权限）
+
+  - docer中安装mongodb服务
+
+    dockerhub中找到mondodb，下载慢可配置中国源，这里用到vi
+
+    安装完之后重启docker，启动服务（docker run -d --name some-mongo -p 10050:27017 mongo:4）
+
+    在测试之前，在宿主机防火墙放行10050端口（映射的容器中的27017端口）两种方式（1关闭防火情Ubuntu：service ufw stop CentOS：service firewalld stop，2将10050添加到放行规则Ubuntu：ufw allow Port10050 CentOS：firewall -cmd --zoom=public --add-port=10050/tcp --permanent 回车成功后 firewall-cmd reload 不成功时查看状态 firewall -cmd --state）
+
+    > 推荐远程mongo服务的工具：robo 3t，图形化界面
+
+#### 开发系统环境
+
+##### 虚拟机
+
+windows：vmware，Hyper-V
+
+mac：Parrallels Desktop
+
+Linux：Hypervisor
+
+##### Linux
+
+版本
+
+目录结构
+
+文件权限
+
+硬件/性能：
+
+mount，df，Top，性能测试方法（）
+
+#### Linux常见指令
+
+##### 文件
+
+增删改查，权限控制，路径
+
+##### 磁盘
+
+##### 用户及组
+
+##### 压缩与解压
+
+##### 进程/服务
+
+##### 网络
+
+防火墙，IP DNS设置，下载，SSH远程
+
+#### Docker初识
+
+##### 定义
+
+##### 安装
+
+##### 命令
+
+docker run
+
+docker start/stop/reatart
+
+docker images 查看当前下载了哪些镜像
+
+docker ps 查看当前运行的docker服务
+
+docker inspect
+
+docker logs
+
+docker exec
+
+##### docer-compose工具
+
+##### docker仓库
+
+docker gub
+
+harbor建立私有仓库
+
+#### Nodejs
+
+##### 基础
+
+##### nvm版本管理工具
+
+安装
+
+命令：切换版本，安装新版本，设置默认版本
+
+##### yarn/npm包管理工具
+
+##### npm发布
+
+#### 调试工具
+
+##### Chrome调试工具DevTools
+
+##### 真机调试方法
+
+#### IDE
+
+##### 插件环境：vue
+
+##### 代码规范：eslint，空格设置
+
+##### 调试设置
+
+### UI框架
+
+### 接口测试
+
 ### 前端工程化
 
 #### webpack
