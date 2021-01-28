@@ -386,65 +386,314 @@ nvm use xxx
 
   在Linux安装参考docker-install仓库
 
-  其他环境参考官网
+  From `https://get.docker.com`:
 
-  - docker集合命令工具：docker compose，安装参考官网（安装，权限）
-
+  ```
+curl -fsSL https://get.docker.com -o get-docker.sh
+  sh get-docker.sh
+```
+  
+其他环境参考官网
+  
+- docker集合命令工具：docker compose，安装参考docker官网（安装，权限）
+  
+  ```
+    # 安装
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    # 上面安装后执行docker-compose -v出错，可能是网络原因没有装完整，换一种安装方式
+    wget https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m) -O /usr/local/bin/docker-compose
+    # 权限
+    sudo chmod +x /usr/local/bin/docker-compose
+    ```
+  
   - docer中安装mongodb服务
-
-    dockerhub中找到mondodb，下载慢可配置中国源，这里用到vi
-
-    安装完之后重启docker，启动服务（docker run -d --name some-mongo -p 10050:27017 mongo:4）
-
+  
+    dockerhub中找到mondodb，查找到latest最新版本，安装指定版本`docker pull mongo:4`
+  
+    下载慢可配置中国源（参考[docker doc](https://docs.docker.com/registry/recipes/mirror/)），这里用到vi
+  
+    > Either pass the `--registry-mirror` option when starting `dockerd` manually, or edit [`/etc/docker/daemon.json`](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file) and add the `registry-mirrors` key and value, to make the change persistent.
+  >
+    > ```
+    > {
+    >   "registry-mirrors": ["https://registry.docker-cn.com"]
+    > }
+    > ```
+    >
+    > Save the file and reload Docker for the change to take effect.
+    
+    安装完之后重启docker`service docker restart`重新下载
+    
+    启动服务（docker run -d --name some-mongo -p 10050:27017 mongo:4）
+    
     在测试之前，在宿主机防火墙放行10050端口（映射的容器中的27017端口）两种方式（1关闭防火情Ubuntu：service ufw stop CentOS：service firewalld stop，2将10050添加到放行规则Ubuntu：ufw allow Port10050 CentOS：firewall -cmd --zoom=public --add-port=10050/tcp --permanent 回车成功后 firewall-cmd reload 不成功时查看状态 firewall -cmd --state）
-
+    
     > 推荐远程mongo服务的工具：robo 3t，图形化界面
 
 #### 开发系统环境
 
 ##### 虚拟机
 
-windows：vmware，Hyper-V
+- **windows：vmware，Hyper-V**
 
-mac：Parrallels Desktop
+win10以上以及windows server都是有默认的hyper-v组件
 
-Linux：Hypervisor
+- **mac：Parrallels Desktop**
+
+安装centos7镜像7.6 1810 DVD版，ctrl+option释放光标：选择时区，选择语言，INSTALLATION（done），SOFTWARE（Virtualization Host全选），NETWORK（ON，Config配置网络默认），BEGIN INSTALL，设置密码，Rebot
+
+注意：最开始要选择英文
+
+> 安装7.9 2009DVD版：
+
+- **Linux：Hypervisor**
 
 ##### Linux
 
-版本
+Linux是一种开源电脑操作系统内核，c语言编写，符合POSIX标准的类Unix操作系统
+
+- **版本**
+
+linux发行版：简单来说就是linux内核和应用软件的打包，常用linux发行版：CentOS，Ubuntu，redhat，Debain，Fedora等
+
+CentOS：镜像下载推荐DVD，https://wiki.centos.org/zh/Download，选择镜站进行下载
+
+Debain：系统资源占用少，社区维护，更新快
+
+Ubuntu：基于Debain，桌面版新手友好
+
+> Ubuntu:  <http://mirrors.aliyun.com/ubuntu-releases/>
+>
+> Centos: <https://mirrors.aliyun.com/centos/>
+>
+> 阿里云镜像：<https://opsx.alibaba.com/mirror>
+>
+> 清华镜像：<https://mirrors.tuna.tsinghua.edu.cn/>
+
+- **目录结构**
+
+- **文件权限**
+
+- **硬件/性能**
+
+ssh链接远程系统
+
+查看版本
+
+查看硬件资源
+
+测试硬件性能
+
+```
+ssh -p 27822 name@xxx.xxx.cn
+lsb_release -a # 查看版本，未找到lsb_release时，安装lsb：yum install redhat-lsb -y，切换root：su
+uname -a # 查看内核版本
+
+df # 查看磁盘空间
+df -Th # 以G为单位查看磁盘空间
+
+cd /
+ls -la # 查看文件目录及权限
+```
 
 目录结构
 
-文件权限
+```
+...
+home # 个人目录
+etc # 软件的配置文件
+sys # 系统目录
+usr # 系统可执行文件
+	sbin # 超级管理员可执行文件
+	local # 本地可执行文件
+	...
+var # 日志文件
+	www # 网站目录
+```
 
-硬件/性能：
+cpu/内存/进程
 
-mount，df，Top，性能测试方法（）
+```
+top # 查看在运行的进程/cpu/内存使用情况 m # 查看内存使用情况 ctrl+c # 退出top命令
+```
+
+> mount，df，Top，性能测试方法（）好像有的没讲到。。。
 
 #### Linux常见指令
+
+文档型：文件相关命令（touch，cat，echo，rm，vi，cd）
+
+硬件型：磁盘/进程/服务/网络
+
+功能型：压缩/解压，下载，远程
 
 ##### 文件
 
 增删改查，权限控制，路径
 
+```
+ls # 查看目录
+mkdir # 新建目录
+touch xxx # 新建xxx文件
+vi xxx # 进入vim编辑器
+i # insert状态
+esc:wq # 保存退出
+esc:q! # 不保存退出
+cat xxx # 查看xxx文件内容
+echo 'content' >> xxx # 在文件后面增加content内容
+echo 'content' > xxx # 覆盖在文件内容
+rm xxx # 删除文件
+rm -r xxx # 删除目录
+rm -rf xxx # 强制删除
+```
+
 ##### 磁盘
+
+```
+pwd # 查看当前完整路径
+```
 
 ##### 用户及组
 
-##### 压缩与解压
+##### 下载/压缩/解压
+
+```
+wget url # 下载
+tar zxvf xxx # 解压 z 代表gz结尾，x解压缩 v显示解压过程 f使用归档的名字
+tar zcvf 压缩后文件名 要压缩的目录 # 压缩
+```
 
 ##### 进程/服务
+
+```
+ps -ef ｜ grep docker # 查看进程 grep 搜索进程
+kill -9 进程id # 9 强制终止
+service 服务名称（sshd） status # 查看系统服务状态
+service 服务名称 stop # 关闭服务
+service 服务名称 restart # 重启服务
+systemctl status 服务名称（firewalld.service）
+```
 
 ##### 网络
 
 防火墙，IP DNS设置，下载，SSH远程
 
+ssh远程连接Linux
+
+ssh（Secure Shell安全外壳协议）加密，安全，默认22端口，容易受到攻击需要改默认端口
+
+```
+ssh -p 22 root（用户名）@（ip地址）
+输入密码
+cat /etc/hostname # 查看主机名
+
+# 修改 ssh 默认端口
+service sshd status # Ubuntu系统是 ssh 不是sshd
+netstat -anlp ｜ grep sshd # 查看默认端口
+vi /etc/ssh/sshd_config # vim打开配置文件
+Port 10022 # 修改 Port
+semanage port -a -t ssh_port_t -p tcp #PORTNUMBER # 通知 SELinux 端口已经改变，Ubuntu 不需要这一步
+yum whatprovides semanage # 提示 semanage 不存在时，反查哪个包提供这个命令
+yum insatll -y policycoreutils-pthon # 安装这个包，重复上面命令
+semanage port -l ｜ grep ssh # 查看默认端口
+semanage port -d  -t ssh_port_t -p tcp xxxxx # 删除多余端口号
+service sshd restart # 重启 ssh
+
+PasswordAuthentication no # 修改配置文件最后一句，使用 root 用户登录时不再验证密码
+
+# ssh密钥登录，免密码登录
+# 在本地
+cd ~/.ssh
+ls
+ssh-keygen # 在本地生成ssh key，在id_rsa.pub文件中
+vi config # 修改配置
+Host naixes 
+	Port 10022 
+	HostName xx.xxx.xxx.xxx
+	User root
+	IdentityFile ~/.ssh/id_rsa
+	IdentitiesOnly yes # 添加
+# 在服务器
+cd ~/.ssh
+ls
+mkdir -p ~/.ssh # 没有文件时新建
+vi authorized_keys
+# 添加一行，公钥的内容，即id_rsa.pub里面的内容，保存
+
+ssh naixes # 登录服务器
+```
+
 #### Docker初识
 
 ##### 定义
 
+为了解决环境配置问题，容器化应用
+
+**Docker 属于 Linux 容器的一种封装，提供简单易用的容器使用接口。**它是目前最流行的 Linux 容器解决方案。
+
+Docker 将应用程序与该程序的依赖，打包在一个文件里面。运行这个文件，就会生成一个虚拟容器。程序在这个虚拟容器里运行，就好像在真实的物理机上运行一样。有了 Docker，就不用担心环境问题。
+
+总体来说，Docker 的接口相当简单，用户可以方便地创建和使用容器，把自己的应用放入容器。容器还可以进行版本管理、复制、分享、修改，就像管理普通的代码一样。
+
+**vs虚拟机**
+
+> docker：app1 app2 --- Docker --- 操作系统 --- 基础设施（共用操作系统和基础设施，由docker进程管理应用，比虚拟机快得多）
+>
+> 虚拟机：虚拟机1 --- 操作系统1 --- 虚拟化平台 --- 基础设施（占用系统资源多）
+
+###### 虚拟机（virtual machine）
+
+就是带环境安装的一种解决方案。它可以在一种操作系统里面运行另一种操作系统，比如在 Windows 系统里面运行 Linux 系统。应用程序对此毫无感知，因为虚拟机看上去跟真实系统一模一样，而对于底层系统来说，虚拟机就是一个普通文件，不需要了就删掉，对其他部分毫无影响。
+
+虽然用户可以通过虚拟机还原软件的原始环境。但是，这个方案有几个缺点。
+
+**（1）资源占用多**
+
+虚拟机会独占一部分内存和硬盘空间。它运行的时候，其他程序就不能使用这些资源了。哪怕虚拟机里面的应用程序，真正使用的内存只有 1MB，虚拟机依然需要几百 MB 的内存才能运行。
+
+**（2）冗余步骤多**
+
+虚拟机是完整的操作系统，一些系统级别的操作步骤，往往无法跳过，比如用户登录。
+
+**（3）启动慢**
+
+启动操作系统需要多久，启动虚拟机就需要多久。可能要等几分钟，应用程序才能真正运行。
+
+###### Linux 容器
+
+由于虚拟机存在这些缺点，Linux 发展出了另一种虚拟化技术：**Linux 容器（Linux Containers，缩写为 LXC）**。
+
+**Linux 容器不是模拟一个完整的操作系统，而是对进程进行隔离。**或者说，在正常进程的外面套了一个[保护层](https://opensource.com/article/18/1/history-low-level-container-runtimes)。对于容器里面的进程来说，它接触到的各种资源都是虚拟的，从而实现与底层系统的隔离。
+
+由于容器是**进程级别的**，相比虚拟机有很多优势。
+
+**（1）启动快**
+
+容器里面的应用，直接就是底层系统的一个进程，而不是虚拟机内部的进程。所以，启动容器相当于启动本机的一个进程，而不是启动一个操作系统，速度就快很多。
+
+**（2）资源占用少**
+
+容器只占用需要的资源，不占用那些没有用到的资源；虚拟机由于是完整的操作系统，不可避免要占用所有资源。另外，多个容器可以共享资源，虚拟机都是独享资源。
+
+**（3）体积小**
+
+容器只要包含用到的组件即可，而虚拟机是整个操作系统的打包，所以容器文件比虚拟机文件要小很多。
+
+总之，容器有点像轻量级的虚拟机，能够提供虚拟化的环境，但是成本开销小得多。
+
+**特性**
+
+文件，资源，网络隔离
+
+变更管理：commit pull push等命令，日志记录
+
+写时复制：用写时复制的方式创建根文件系统，而虚拟机要划分一部分系统资源
+
 ##### 安装
+
+Mac：安装docker.dmg，使用docker version 查看版本，自带docker compose集合命令工具
+
+Linux：
 
 ##### 命令
 
