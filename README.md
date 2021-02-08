@@ -388,47 +388,55 @@ nvm use xxx
 
   From `https://get.docker.com`:
 
-  ```
-curl -fsSL https://get.docker.com -o get-docker.sh
-  sh get-docker.sh
 ```
-  
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+```
+```
 其他环境参考官网
-  
 - docker集合命令工具：docker compose，安装参考docker官网（安装，权限）
-  
-  ```
+```
     # 安装
     sudo curl -L "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     # 上面安装后执行docker-compose -v出错，可能是网络原因没有装完整，换一种安装方式
     wget https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m) -O /usr/local/bin/docker-compose
     # 权限
     sudo chmod +x /usr/local/bin/docker-compose
-    ```
-  
-  - docer中安装mongodb服务
+    # 查看版本
+    docker-compose -v
+
+  - docker中安装mongodb服务
   
     dockerhub中找到mondodb，查找到latest最新版本，安装指定版本`docker pull mongo:4`
   
     下载慢可配置中国源（参考[docker doc](https://docs.docker.com/registry/recipes/mirror/)），这里用到vi
-  
-    > Either pass the `--registry-mirror` option when starting `dockerd` manually, or edit [`/etc/docker/daemon.json`](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file) and add the `registry-mirrors` key and value, to make the change persistent.
-  >
-    > ```
-    > {
-    >   "registry-mirrors": ["https://registry.docker-cn.com"]
-    > }
-    > ```
-    >
-    > Save the file and reload Docker for the change to take effect.
-    
-    安装完之后重启docker`service docker restart`重新下载
-    
-    启动服务（docker run -d --name some-mongo -p 10050:27017 mongo:4）
-    
-    在测试之前，在宿主机防火墙放行10050端口（映射的容器中的27017端口）两种方式（1关闭防火情Ubuntu：service ufw stop CentOS：service firewalld stop，2将10050添加到放行规则Ubuntu：ufw allow Port10050 CentOS：firewall -cmd --zoom=public --add-port=10050/tcp --permanent 回车成功后 firewall-cmd reload 不成功时查看状态 firewall -cmd --state）
-    
-    > 推荐远程mongo服务的工具：robo 3t，图形化界面
+> Either pass the `--registry-mirror` option when starting `dockerd` manually, or edit [`/etc/docker/daemon.json`](https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file) and add the `registry-mirrors` key and value, to make the change persistent.
+>
+> ```
+> {
+> "registry-mirrors": ["https://registry.docker-cn.com"]
+> }
+> ```
+
+修改完之后重启docker`service docker restart`重新下载
+
+> 报错：Error response from daemon: Get https://registry-1.docker.io/v2/: net/http: request canceled while waiting for connection (Client.Timeout exceeded while awaiting headers)
+>
+> 方法一：增加国内镜源（不起作用）
+>
+> 方法二：（可行）
+>
+> 第一步：通过`dig @114.114.114.114 registry-1.docker.io`找到可用IP地址
+>
+> 第二步：修改`/etc/hosts`强制docker.io相关的域名解析到其它可用IP
+>
+> 第三步：保存配置文件后进行多次重试可以成功下载镜像
+
+启动服务（docker run -d --name some-mongo -p 10050:27017 mongo:4）
+
+在测试之前，在宿主机防火墙放行10050端口（映射的容器中的27017端口）两种方式（1关闭防火情Ubuntu：service ufw stop CentOS：service firewalld stop，2将10050添加到放行规则Ubuntu：ufw allow Port10050 CentOS：firewall -cmd --zoom=public --add-port=10050/tcp --permanent 回车成功后 firewall-cmd reload 不成功时查看状态 firewall -cmd --state）
+
+> 推荐远程mongo服务的工具：robo 3t，图形化界面
 
 #### 开发系统环境
 
@@ -691,33 +699,197 @@ Docker 将应用程序与该程序的依赖，打包在一个文件里面。运�
 
 ##### 安装
 
+Docker 分为 CE 和 EE 两大版本。CE 即社区版（免费），EE 即企业版，强调安全，付费使用。Docker支持在主流的操作系统平台上使用，包括Ubuntu、Centos、Windows、MacOS系统等。
+Docker CE 分为 stable, test, 和 nightly 三个更新频道。每六个月发布一个 stable 版本 (18.09, 19.03, 19.09...)。
+
 Mac：安装docker.dmg，使用docker version 查看版本，自带docker compose集合命令工具
 
-Linux：
+Linux：测试环境中的的方法是使用了官方提供的一套便捷的安装脚本
+
+官方文档：https://docs.docker.com/engine/install/centos/
+
+- 卸载之前安装的docker
+
+```cmd
+$ sudo yum remove docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-selinux \
+docker-engine-selinux \
+docker-engine
+# 报错 Error: Trying to remove "yum", which is protected
+# 解决：忽略依赖只移除自己
+rpm -e --nodeps docker \
+docker-client \
+docker-client-latest \
+docker-common \
+docker-latest \
+docker-latest-logrotate \
+docker-logrotate \
+docker-selinux \
+docker-engine-selinux \
+docker-engine
+```
+
+- 安装依赖
+
+```cmd
+$ sudo yum install -y yum-utils \
+device-mapper-persistent-data \
+lvm2
+```
+
+添加stable的Docker-ce源
+
+```cmd
+$ sudo yum-config-manager \
+--add-repo \
+https://mirrors.ustc.edu.cn/docker-ce/linux/centos/docker-ce.repo
+# 阿里源
+sudo yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+# 官方源
+$ sudo yum-config-manager \
+--add-repo \
+https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+> 如果需要测试版本的 Docker CE 请使用以下命令：
+>
+> 1. `$ sudo yum-config-manager --enable docker-ce-test`
+>
+> 如果需要每日构建版本的 Docker CE 请使用以下命令：
+>
+> 1. `$ sudo yum-config-manager --enable docker-ce-nightly`
+>
+> 更新 yum 软件缓存：
+>
+> ```cmd
+> sudo yum makecache fast
+> ```
+
+- 安装 Docker-ce：
+
+```
+sudo yum install docker-ce docker-ce-cli containerd.io
+```
+
+启动 Docker 后台服务
+
+```
+systemctl start docker
+# 查看状态
+systemctl status docker
+# 启动hello-word
+sudo docker run hello-world
+# 报错：Unable to find image 'helle-word:latest' locally，提示本地没找到，然后开始从远程拉取
+```
+
+在`/etc/docker/daemon.json`中配置中国源
+
+```cmd
+# 配置完成后重启
+systemctl daemon-reload
+systemctl restsrt docker
+```
 
 ##### 命令
 
-docker run
-
+```cmd
+docker run name # -p表示进行端口映射 外:内
 docker start/stop/reatart
-
-docker images 查看当前下载了哪些镜像
-
-docker ps 查看当前运行的docker服务
-
+docker images # 查看当前下载了哪些镜像
+docker ps # 查看当前运行的docker服务 docker ps -a 查看所有镜像
 docker inspect
-
-docker logs
-
+docker logs name # 打印日志 -f表示持续打印
+docker rm name/id # 删除已经停止的容器
 docker exec
+```
 
 ##### docer-compose工具
 
+可以用一条命令运行多个镜像，docker的集合命令工具
+
+安装参考测试环境
+
+Using Compose is basically a three-step process:
+
+1. Define your app’s environment with a `Dockerfile` so it can be reproduced anywhere.
+2. Define the services that make up your app in `docker-compose.yml` so they can be run together in an isolated environment.
+3. Run `docker-compose up` and Compose starts and runs your entire app.
+
+A `docker-compose.yml` looks like this:
+
+```
+version: "3.9"  # optional since v1.27.0
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+      - logvolume01:/var/log
+    links:
+      - redis
+  redis:
+    image: redis
+volumes:
+  logvolume01: {}
+```
+
+使用：
+
+```cmd
+cd /home/
+vi docker-compose.yml
+# 操作文件
+version: '3'
+services:
+	# mysql服务
+  mysql1:
+    image: mysql
+    # 环境变量
+    environment: 
+    - MYSQL_ROOT_PASSWORD=123456
+    # 端口映射
+    ports: 
+    - 28002:3306
+    
+    mysql2:
+    image: mysql
+    environment: 
+    - MYSQL_ROOT_PASSWORD=123456
+    ports: 
+    - 28003:3306
+:wq
+# 启动docker-compose
+docker-compose up -d
+docker ps
+docker logs -f home_mysql1_1
+# 命令有start stop rm
+```
+
 ##### docker仓库
 
-docker gub
+###### docker gub
 
-harbor建立私有仓库
+```
+# 登录docker hub
+docker login
+# 提交自己的镜像
+# 1.0是tag
+docker commit [containerid] naixes/mysql:1.0
+# 查看
+docker images
+# 推送到docker hub
+docker push naixes/mysql:1.0
+```
+
+###### harbor建立私有仓库
 
 #### Nodejs
 
