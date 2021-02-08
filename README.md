@@ -899,7 +899,36 @@ docker push naixes/mysql:1.0
 
 安装
 
+`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash`或`wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash`
+
+> Failed connect to raw.githubusercontent.com:443; 拒绝连接
+>
+> 在https://www.ipaddress.com/查询raw.githubusercontent.com的真实IP。
+>
+> 通过修改`hosts`解决此问题
+>
+> `199.232.28.133 raw.githubusercontent.com`
+
+将下面内容添加到~/.bash_profile
+
+```
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
+
+> 若安装后提示找不到nvm命令，则在~/.nvm中检查.bash_profile文件
+
 命令：切换版本，安装新版本，设置默认版本
+
+```
+nvm list
+nvm ls-remote # (mac)
+nvm install v11.14.0 # nvm install stable
+nvm --help
+nvm use
+```
+
+nvm-windows
 
 ##### yarn/npm包管理工具
 
