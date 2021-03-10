@@ -9,3 +9,6 @@
 使用layui框架完成样式布局
 
 使用svg-captcha完成图形验证码
+
+使用vuelidate或veevalidate（较简单）数据校验
+
