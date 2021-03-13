@@ -376,7 +376,7 @@ nvm use xxx
 
 ##### 测试环境及mongo数据库环境
 
-三种方式：
+linux三种方式：
 
 - 虚拟机自建环境（Parallels/Vmware/Hyperv）
 
@@ -448,7 +448,7 @@ win10以上以及windows server都是有默认的hyper-v组件
 
 - **mac：Parrallels Desktop**
 
-安装centos7镜像7.6 1810 DVD版，ctrl+option释放光标：选择时区，选择语言，INSTALLATION（done），SOFTWARE（Virtualization Host全选），NETWORK（ON，Config配置网络默认），BEGIN INSTALL，设置密码，Rebot
+安装centos7镜像7.6 1810 DVD版，ctrl+option释放光标：选择时区，选择语言，INSTALLATION（done），SOFTWARE（Virtualization Host全选），NETWORK（ON，Config配置网络默认），BEGIN INSTALL，设置密码（设置的最常用的那个密码），Rebot，登录输入root和密码
 
 注意：最开始要选择英文
 
@@ -614,7 +614,7 @@ PasswordAuthentication no # 修改配置文件最后一句，使用 root 用户�
 cd ~/.ssh
 ls
 ssh-keygen # 在本地生成ssh key，在id_rsa.pub文件中
-vi config # 修改配置
+vi config # 修改配置，没有文件时新建
 Host naixes 
 	Port 10022 
 	HostName xx.xxx.xxx.xxx
@@ -622,10 +622,10 @@ Host naixes
 	IdentityFile ~/.ssh/id_rsa
 	IdentitiesOnly yes # 添加
 # 在服务器
-cd ~/.ssh
+cd ~/.ssh # 如果没有该目录说明root没有登录过，执行ssh localhost即可
 ls
 mkdir -p ~/.ssh # 没有文件时新建
-vi authorized_keys
+vi authorized_keys # 没有文件时新建，touch xx
 # 添加一行，公钥的内容，即id_rsa.pub里面的内容，保存
 
 ssh naixes # 登录服务器
@@ -777,6 +777,12 @@ https://download.docker.com/linux/centos/docker-ce.repo
 sudo yum install docker-ce docker-ce-cli containerd.io
 ```
 
+> 报错：获取 GPG 密钥失败
+>
+> 解决：看报错信息是超时就继续添加其他stable的Docker-ce源
+>
+> 其他原因就试一下：rpm --import http://mirrors.163.com/centos/RPM-GPG-KEY-CentOS-7
+
 启动 Docker 后台服务
 
 ```
@@ -791,10 +797,28 @@ sudo docker run hello-world
 在`/etc/docker/daemon.json`中配置中国源
 
 ```cmd
+{
+	"registry-mirrors": ["https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://docker.mirrors.ustc.edu.cn","https://cr.console.aliyun.com/"]
+}
+# Docker中国区官方镜像:
+# https://registry.docker-cn.com
+# 网易:
+# http://hub-mirror.c.163.com
+# ustc:
+# https://docker.mirrors.ustc.edu.cn
+# 中国科技大学:
+# https://docker.mirrors.ustc.edu.cn
+# 阿里云:
+# https://cr.console.aliyun.com/
+
 # 配置完成后重启
 systemctl daemon-reload
-systemctl restsrt docker
+systemctl restart docker
 ```
+
+> 报错：Job for docker.service failed because start of the service was attempted too often.
+>
+> 解决：mv /etc/docker/daemon.json /etc/docker/daemon.conf，修改名字
 
 ##### 命令
 
@@ -807,6 +831,7 @@ docker inspect
 docker logs name # 打印日志 -f表示持续打印
 docker rm name/id # 删除已经停止的容器
 docker exec
+docker logs -f name # 打印日志 -f持续打印
 ```
 
 ##### docer-compose工具
@@ -958,7 +983,7 @@ nvm-windows
 
 Fielding将他对互联网软件的架构原则，定名为REST，即Representational State Transfer的缩写。我对这个词组的翻译是"表现层状态转化"。如果一个架构符合REST原则，就称它为RESTful架构。
 
-**资源（Resources）**
+- 资源（Resources）
 
 REST的名称"表现层状态转化"中，省略了主语。"表现层"其实指的是"资源"（Resources）的"表现层"。
 
@@ -966,7 +991,7 @@ REST的名称"表现层状态转化"中，省略了主语。"表现层"其实指
 
 所谓"上网"，就是与互联网上一系列的"资源"互动，调用它的URI。
 
-**表现层（Representation）**
+- 表现层（Representation）
 
 "资源"是一种信息实体，它可以有多种外在表现形式。**我们把"资源"具体呈现出来的形式，叫做它的"表现层"（Representation）。**
 
@@ -974,7 +999,7 @@ REST的名称"表现层状态转化"中，省略了主语。"表现层"其实指
 
 URI只代表资源的实体，不代表它的形式。严格地说，有些网址最后的".html"后缀名是不必要的，因为这个后缀名表示格式，属于"表现层"范畴，而URI应该只代表"资源"的位置。它的具体表现形式，应该在HTTP请求的头信息中用Accept和Content-Type字段指定，这两个字段才是对"表现层"的描述。
 
-**状态转化（State Transfer）**
+- 状态转化（State Transfer）
 
 访问一个网站，就代表了客户端和服务器的一个互动过程。在这个过程中，势必涉及到数据和状态的变化。
 
@@ -985,3 +1010,86 @@ URI只代表资源的实体，不代表它的形式。严格地说，有些网�
 #### Mock数据
 
 #### 性能测试
+
+## 文档与版本管理
+
+文档分类：接口文档，项目文档，需求文档，规范类文档
+
+- 文档管理工具
+
+协同工具：钉钉，石墨，有道云等
+
+接口文档：showdoc，apizza，eolinker，mindoc
+
+其他：gitbook，blog（hexo，jekyll，hugo，wordpress），注释产出api文档（swagger，apidoc），mock（rap，apijson）
+
+### mackdown
+
+工具：
+
+typora，偏好设置，图像
+
+mdeditor
+
+### 文档管理工具
+
+#### showDoc
+
+接口文档管理工具
+
+- 可以私有化部署：showdoc，mindoc（文档，简洁）
+- 云端：apizza，eolinker（文档+测试）
+
+功能：接口模版，分组，权限控制，团队协作，版本控制，本地部署，免费开源
+
+##### 安装使用
+
+###### 私有化部署
+
+Docker方式安装
+
+```cmd
+# 原版官方镜像安装命令(中国大陆用户不建议直接使用原版镜像，可以用后面的加速镜像)
+docker pull star7th/showdoc 
+# 中国大陆镜像安装命令（安装后记得执行docker tag命令以进行重命名）
+docker pull registry.cn-shenzhen.aliyuncs.com/star7th/showdoc
+docker tag registry.cn-shenzhen.aliyuncs.com/star7th/showdoc:latest star7th/showdoc:latest 
+##后续命令无论使用官方镜像还是加速镜像都需要执行
+#新建存放showdoc数据的目录
+mkdir -p /showdoc_data/html
+chmod  -R 777 /showdoc_data
+# 启动showdoc容器，官方提供的方式：
+# docker run -d --name showdoc --user=root --privileged=true -p 4999:80 \
+# -v /showdoc_data/html:/var/www/html/ star7th/showdoc
+
+# -d后台执行，需要关闭防火墙和运营商的放行，-v数据映射
+# 返回一个hash值
+docker run -d --name showdoc_test -p 13500:80 -v /showdoc_data/html:/var/www/html/ star7th/showdoc
+# 数据转移
+docker exec showdoc_test \cp -fr /showdoc_data/html/ /var/www/html
+chmod  -R 777 /showdoc_data
+# 防火墙放行
+firewall-cmd --add-port=13500/tcp --permanent
+firewall-cmd --reload
+# 然后就可以使用ip port的形式进行访问了：http://192.168.1.7:13500/
+```
+
+访问：http://192.168.1.7:13500/
+
+> 安装成功！默认管理员账户密码是showdoc/123456。登录后，在右上角可以看到管理后台入口。此外，强烈建议修改管理员初始密码。若再遇到问题，可参考ShowDoc帮助文档：https://www.showdoc.cc/help
+>
+> [进入网站首页](http://192.168.1.7:13500/)
+
+修改密码，新建用户，重新登录，新建项目等等
+
+定义接口
+
+#### 云笔记文档管理
+
+印象笔记
+
+onenote
+
+有道云
+
+#### Hexo
