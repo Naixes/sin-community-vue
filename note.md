@@ -834,7 +834,7 @@ docker exec
 docker logs -f name # 打印日志 -f持续打印
 ```
 
-##### docer-compose工具
+##### docker-compose工具
 
 可以用一条命令运行多个镜像，docker的集合命令工具
 
@@ -1093,3 +1093,437 @@ onenote
 有道云
 
 #### Hexo
+
+```cmd
+npm install hexo-cli -g
+hexo init blog
+cd blog
+npm install
+hexo server
+```
+
+##### 部署到github pages
+
+插件：hexo-deployer-git
+
+配置：
+
+仓库名：yonghuming.github.io拷贝ssh
+
+添加ssh：
+
+```cmd
+# -b 4096增加安全性
+ssh-keygen -t rsa -b 4096 -C "615411375@qq.com"
+```
+
+添加到github
+
+```yml
+# _config.yml
+...
+deploy:
+  type: git
+  repo: git@github.com:Naixes/Naixes.github.io.git,
+  branch: master
+  # token: ""
+  # message: [message]
+  name: Naixes
+  email: 615411375@qq.com
+  # extend_dirs: [extend directory]
+  # ignore_hidden: false # default is true
+  # ignore_pattern: regexp # whatever file that matches the regexp will be ignored when deploying
+  
+# 命令
+hexo g # 产生静态文件
+
+```
+
+### 版本管理
+
+语义化版本规范
+
+主版本.次版本.修订号-先行版本.1+元数据：1.2.3-beta.1+meta
+
+alpha -> beta -> rc -> release
+
+内测版本 - 公测版本 - 发行候选版本
+
+#### vs svn
+
+git：分布式，本地可以不用联网进行一些操作，本地合并代码
+
+svn：集中式，操作必须联网
+
+#### git
+
+git多密钥管理
+
+```cmd
+# ./.ssh/config中配置
+
+Host xx
+  Port xx
+  HostName xx
+  User xx
+  # 鉴权方式
+  PreferredAuthentications publickey
+  # 指定本地使用的密钥路径
+  IdentifyFile xx
+  IdentitiesOnly true
+```
+
+https：需要输入用户名密码，access token的方式
+
+ssh：使用密钥对，win需要使用gitbash进行创建，如果有共享需求建议设置passphrase进行加密
+
+```cmd
+git init
+git add .
+git commit -m ""
+git remote add origin git@xxx # 添加origin，git clone会自动添加，可以使用任意名称，可以用来推送给多个仓库
+git push -u origin master # -u 设置默认推送分支
+
+git remote -v
+```
+
+快照
+
+![git基础](note.assets/git基础.png)
+
+```cmd
+git log/reflog # 日志，reflog本地提交，分支切换等
+git config --global --list # 查看全局配置
+git config --global user.name "xxx"
+git reset --hard 22c7f3a # 回退，reflog可以查看到日志
+git branch xxx # 新建分支
+git checkout xxx # 切换分支
+git stash # 当前内容未完成暂时不做提交，可以用在查看其他分支前暂存当前分支修改内容
+git stash apply # 找回之前暂存的内容
+git diff
+```
+
+
+
+#### git flow
+
+##### 模型
+
+![src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina](note.assets/src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina.jpeg)
+
+经典模型的问题：
+
+- 必须使用dev分支
+- 复杂度高：hotfix和release分支
+- 多次的merge合并
+
+推荐模型：
+
+适用于持续集成多环境场景，小版本迭代
+
+上游分支向下游发展，master领先于预发布版本领先于发布版本
+
+bug -> branch -> master -> pre branch -> target branch
+
+![截屏2021-03-15 下午2.04.43](note.assets/截屏2021-03-15 下午2.04.43.png)
+
+
+
+
+
+适用于版本项目，比如vue，react
+
+稳定版本从master检出bug修复在分支
+
+master -> stable -> branch -> bugfix -> version
+
+![截屏2021-03-15 下午2.28.24](note.assets/截屏2021-03-15 下午2.28.24.png)
+
+##### 分支管理和冲突处理
+
+```cmd
+git branch -D dev # 删除分支dev
+git checkout -b dev # 创建并切换deb分支
+
+# 发生冲突，修改文件，解决冲突重新提交
+
+git fetch origin dev # 拉取远程dev分支更新，不更新本地，git pull 相当于git fetch + git merge
+git reset --hard head^ # 回退到上一个提交
+git merge xx # 将xx分支合并到当前分支
+git tag v1.1.1 # -d删除 --list列表
+git push origin master --tags
+git push origin :refs/tags/v1.0.0
+git checkout --test.txt # 丢弃文件改动
+```
+
+##### 搭建GitLab
+
+突破限制
+
+docker-compose快速创建
+
+配置gitlab，备份/还原
+
+其他配置：邮件，HTTPS
+
+You can fine tune these directories to meet your requirements. Once you’ve set up the `GITLAB_HOME` variable, you can run the image:
+
+```cmd
+sudo docker run --detach \
+  --hostname 192.168.1.7 \
+  --publish 13880:80 --publish 13822:22 \
+  --name gitlab \
+  --restart always \
+  gitlab/gitlab-ee:latest
+  
+# 查看
+docker ps | grep gitlab
+
+# 放行端口
+firewall-cmd --add-port=13880/tcp --permanent
+> success
+firewall-cmd --reload
+> success
+
+# 查看日志
+docker logs -f gitlab
+
+# 打开http://192.168.1.7:13880/设置密码或者登录
+
+```
+
+###### 配置
+
+```cmd
+# 配置参考docker-gitlab
+# docker-compose.yml
+version: '2.3'
+
+services:
+  redis:
+    restart: always
+    image: redis:5.0.9
+    command:
+    - --loglevel warning
+    volumes:
+    - redis-data:/var/lib/redis:Z
+
+  postgresql:
+    restart: always
+    image: sameersbn/postgresql:12-20200524
+    volumes:
+    - postgresql-data:/var/lib/postgresql:Z
+    environment:
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlabhq_production
+    - DB_EXTENSION=pg_trgm,btree_gist
+
+  gitlab:
+    restart: always
+    image: sameersbn/gitlab:13.9.3
+    depends_on:
+    - redis
+    - postgresql
+    ports:
+    - "13880:80"
+    - "13822:22"
+    volumes:
+    - gitlab-data:/home/git/data:Z
+    healthcheck:
+      test: ["CMD", "/usr/local/sbin/healthcheck"]
+      interval: 5m
+      timeout: 10s
+      retries: 3
+      start_period: 5m
+    environment:
+    - DEBUG=false
+
+    - DB_ADAPTER=postgresql
+    - DB_HOST=postgresql
+    - DB_PORT=5432
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlabhq_production
+
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+
+    - TZ=Asia/Kolkata
+    - GITLAB_TIMEZONE=Kolkata
+
+    - GITLAB_HTTPS=true
+    - SSL_SELF_SIGNED=true
+
+    - GITLAB_HOST=192.168.1.7
+    - GITLAB_PORT=13880
+    - GITLAB_SSH_PORT=13822
+    - GITLAB_RELATIVE_URL_ROOT=
+    - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
+    - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
+
+    - GITLAB_ROOT_PASSWORD=12345678
+    - GITLAB_ROOT_EMAIL=615411375@qq.com
+
+    - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
+    - GITLAB_NOTIFY_PUSHER=false
+
+    - GITLAB_EMAIL=notifications@example.com
+    - GITLAB_EMAIL_REPLY_TO=noreply@example.com
+    - GITLAB_INCOMING_EMAIL_ADDRESS=reply@example.com
+
+    - GITLAB_BACKUP_SCHEDULE=daily
+    - GITLAB_BACKUP_TIME=01:00
+
+    - SMTP_ENABLED=false
+    - SMTP_DOMAIN=www.example.com
+    - SMTP_HOST=smtp.gmail.com
+    - SMTP_PORT=587
+    - SMTP_USER=mailer@example.com
+    - SMTP_PASS=password
+    - SMTP_STARTTLS=true
+    - SMTP_AUTHENTICATION=login
+
+    - IMAP_ENABLED=false
+    - IMAP_HOST=imap.gmail.com
+    - IMAP_PORT=993
+    - IMAP_USER=mailer@example.com
+    - IMAP_PASS=password
+    - IMAP_SSL=true
+    - IMAP_STARTTLS=false
+
+    - OAUTH_ENABLED=false
+    - OAUTH_AUTO_SIGN_IN_WITH_PROVIDER=
+    - OAUTH_ALLOW_SSO=
+    - OAUTH_BLOCK_AUTO_CREATED_USERS=true
+    - OAUTH_AUTO_LINK_LDAP_USER=false
+    - OAUTH_AUTO_LINK_SAML_USER=false
+    - OAUTH_EXTERNAL_PROVIDERS=
+
+    - OAUTH_CAS3_LABEL=cas3
+    - OAUTH_CAS3_SERVER=
+    - OAUTH_CAS3_DISABLE_SSL_VERIFICATION=false
+    - OAUTH_CAS3_LOGIN_URL=/cas/login
+    - OAUTH_CAS3_VALIDATE_URL=/cas/p3/serviceValidate
+    - OAUTH_CAS3_LOGOUT_URL=/cas/logout
+
+    - OAUTH_GOOGLE_API_KEY=
+    - OAUTH_GOOGLE_APP_SECRET=
+    - OAUTH_GOOGLE_RESTRICT_DOMAIN=
+
+    - OAUTH_FACEBOOK_API_KEY=
+    - OAUTH_FACEBOOK_APP_SECRET=
+
+    - OAUTH_TWITTER_API_KEY=
+    - OAUTH_TWITTER_APP_SECRET=
+
+    - OAUTH_GITHUB_API_KEY=
+    - OAUTH_GITHUB_APP_SECRET=
+    - OAUTH_GITHUB_URL=
+    - OAUTH_GITHUB_VERIFY_SSL=
+
+    - OAUTH_GITLAB_API_KEY=
+    - OAUTH_GITLAB_APP_SECRET=
+
+    - OAUTH_BITBUCKET_API_KEY=
+    - OAUTH_BITBUCKET_APP_SECRET=
+    - OAUTH_BITBUCKET_URL=
+
+    - OAUTH_SAML_ASSERTION_CONSUMER_SERVICE_URL=
+    - OAUTH_SAML_IDP_CERT_FINGERPRINT=
+    - OAUTH_SAML_IDP_SSO_TARGET_URL=
+    - OAUTH_SAML_ISSUER=
+    - OAUTH_SAML_LABEL="Our SAML Provider"
+    - OAUTH_SAML_NAME_IDENTIFIER_FORMAT=urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+    - OAUTH_SAML_GROUPS_ATTRIBUTE=
+    - OAUTH_SAML_EXTERNAL_GROUPS=
+    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_EMAIL=
+    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_NAME=
+    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_USERNAME=
+    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_FIRST_NAME=
+    - OAUTH_SAML_ATTRIBUTE_STATEMENTS_LAST_NAME=
+
+    - OAUTH_CROWD_SERVER_URL=
+    - OAUTH_CROWD_APP_NAME=
+    - OAUTH_CROWD_APP_PASSWORD=
+
+    - OAUTH_AUTH0_CLIENT_ID=
+    - OAUTH_AUTH0_CLIENT_SECRET=
+    - OAUTH_AUTH0_DOMAIN=
+    - OAUTH_AUTH0_SCOPE=
+
+    - OAUTH_AZURE_API_KEY=
+    - OAUTH_AZURE_API_SECRET=
+    - OAUTH_AZURE_TENANT_ID=
+
+volumes:
+  redis-data:
+  postgresql-data:
+  gitlab-data:
+  
+# 关闭移除之前开启的gitlab
+docker stop gitlab
+docker rm gitlab
+
+# 在tmp目录中进行测试，新建内容如上的docker-compose.yml文件
+docker-compose up -d
+
+# 查看
+docker ps | grep tmp
+docker logs -f tmp_gitlab_1
+
+# 输入网址进行项目管理
+```
+
+###### 备份及恢复
+
+手动备份：
+
+Execute the rake task to create a backup.
+
+```
+docker run --name gitlab -it --rm [OPTIONS] \
+    sameersbn/gitlab:13.9.3 app:rake gitlab:backup:create
+```
+
+using `docker-compose` you may use the following command to execute the backup.
+
+```
+docker-compose rm -sf gitlab
+# yml配置文件目录下执行这句
+docker-compose run --rm gitlab app:rake gitlab:backup:create
+```
+
+自动备份：
+
+上面的配置已经设置了自动备份
+
+```cmd
+# 添加过期时间的配置
+# backup过期时间按秒计算7 days (604800 seconds)
+- GITLAB_BACKUP_EXPIRY=604800
+
+# 更新配置文件
+docker-compose up -d
+```
+
+
+
+#### gitrepo
+
+gitlab
+
+gitea
+
+github
+
+gitee
+
+#### git工具
+
+gitbash
+
+GUI
+
+IDE
