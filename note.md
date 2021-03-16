@@ -1256,9 +1256,13 @@ git push origin :refs/tags/v1.0.0
 git checkout --test.txt # 丢弃文件改动
 ```
 
-##### 搭建GitLab
+#### 搭建GitLab
+
+类似的还有gitea
 
 突破限制
+
+**注意：需要两核两G以上的配置**
 
 docker-compose快速创建
 
@@ -1292,7 +1296,7 @@ docker logs -f gitlab
 
 ```
 
-###### 配置
+##### 配置
 
 ```cmd
 # 配置参考docker-gitlab
@@ -1476,7 +1480,7 @@ docker logs -f tmp_gitlab_1
 # 输入网址进行项目管理
 ```
 
-###### 备份及恢复
+##### 备份及恢复
 
 手动备份：
 
@@ -1508,17 +1512,54 @@ docker-compose run --rm gitlab app:rake gitlab:backup:create
 docker-compose up -d
 ```
 
+恢复：
+
+using `docker-compose` you may use the following command to execute the restore.
 
 
-#### gitrepo
 
-gitlab
+```cmd
+docker-compose run --rm gitlab app:rake gitlab:backup:restore # List available backups
+docker-compose run --rm gitlab app:rake gitlab:backup:restore BACKUP=1515629493_2020_12_06_13.9.3 # Choose to restore from 1515629493
+```
 
-gitea
+**邮件服务配置，HTTPS配置，docker-compose配置文件参考见文档资料**
 
-github
+#### SSL证书申请
 
-gitee
+#### 云服务器
+
+#### Git权限控制
+
+- 以组为单元，设置管理员。角色：所属人，管理员，开发者，测试人员，访问者
+- 熟悉merge request，写好git commit message
+- 及时回收权限，设置过期时间
+
+##### 以gitlab为例
+
+偏好设置，本地化
+
+成员权限设置：项目 -> 成员
+
+一般不设置过期时间，成员不在了也不要删除成员，取消权限即可
+
+组管理组权限：组 -> 成员
+
+保护分支：项目 -> 设置 -> 仓库 
+
+#### gitignore
+
+常见问题：不好管理，冗余
+
+1. 参考仓库：gitignore
+2. 网站：gitignore.io
+3. 插件：.gitignore generator，在项目目录下，输入快捷命令generate .gitignore file
+
+已经被快照过的文件再想ignore的话：
+
+```cmd
+git rm -- cached -r ./ # 删除缓存，不会删除日志
+```
 
 #### git工具
 
@@ -1527,3 +1568,11 @@ gitbash
 GUI
 
 IDE
+
+##### GUI
+
+###### sourcetree
+
+需要注册
+
+vscode插件：gitlens
