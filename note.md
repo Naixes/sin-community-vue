@@ -1011,7 +1011,9 @@ URI只代表资源的实体，不代表它的形式。严格地说，有些网�
 
 #### 性能测试
 
-## 文档与版本管理
+## 敏捷流程
+
+### 文档管理
 
 文档分类：接口文档，项目文档，需求文档，规范类文档
 
@@ -1023,22 +1025,14 @@ URI只代表资源的实体，不代表它的形式。严格地说，有些网�
 
 其他：gitbook，blog（hexo，jekyll，hugo，wordpress），注释产出api文档（swagger，apidoc），mock（rap，apijson）
 
-### mackdown
+markdown工具：typora，偏好设置，图像，mdeditor
 
-工具：
-
-typora，偏好设置，图像
-
-mdeditor
-
-### 文档管理工具
-
-#### showDoc
-
-接口文档管理工具
+**接口文档管理工具**
 
 - 可以私有化部署：showdoc，mindoc（文档，简洁）
 - 云端：apizza，eolinker（文档+测试）
+
+#### showDoc
 
 功能：接口模版，分组，权限控制，团队协作，版本控制，本地部署，免费开源
 
@@ -1202,8 +1196,6 @@ git stash # 当前内容未完成暂时不做提交，可以用在查看其他�
 git stash apply # 找回之前暂存的内容
 git diff
 ```
-
-
 
 #### git flow
 
@@ -1576,3 +1568,201 @@ IDE
 需要注册
 
 vscode插件：gitlens
+
+### 缺陷管理
+
+#### 概念及方法
+
+在项目的全生命周期旨在提高软件的质量
+
+常见问题：需求不明确，进度超期，需求变更频繁，无codereview，协同有问题，工期紧
+
+**最佳实践**
+
+路径
+
+- 质量
+  - 预防
+  - 监测
+- 成本
+  - 人工
+  - 时间
+  - 资源投入
+- 进度
+
+分析原因
+
+办法
+
+- 进度
+  - 赶工
+  - 资源协调
+  - 客户沟通
+  - 压缩工期
+- 质量
+  - 改进
+  - 返工
+  - 沟通
+- 成本
+
+#### 质量/进度管理工作流
+
+![截屏2021-03-16 下午4.11.15](note.assets/截屏2021-03-16 下午4.11.15.png)
+
+##### 质量管理
+
+**需求阶段**：沟通，形成文档，客户确认
+
+**开发阶段**
+
+- lint
+- codereview：小团队互相review，大团队专人review，自动化
+- 规范
+  - 运维
+  - 开发
+- 测试
+  - 测试用例
+  - 自动化
+
+**运维阶段**
+
+- 监控
+- 日志
+- 更新
+  - 责任到人
+  - 功能到店
+  - 时间设限
+
+##### 进度管理
+
+需求阶段：从上至下分析，类比分析，经验分析
+
+开发阶段
+
+运维阶段
+
+#### 缺陷控制工具
+
+代码类：eslint，jslint，stylelint
+
+流程类：jira，禅道，redmine
+
+工具类：trello看板，teambition（比trello复杂一些），钉钉，石墨，worktile
+
+##### eslint
+
+1. npm安装
+
+2. 初始化配置文件
+
+运行 `npx eslint --init` 之后，`.eslintrc` 文件会在你的文件夹中自动创建。你可以在 `.eslintrc` 文件中看到许多像这样的规则：
+
+```
+module.exports = {
+  root: true,
+  env: {
+    node: true
+  },
+  extends: [
+    "plugin:vue/essential"
+    // '@vue/standard'
+  ],
+  parserOptions: {
+    parser: "babel-eslint"
+  },
+  rules: {
+    "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"]
+  }
+};
+```
+
+`"semi"` 和 `"quotes"` 是 ESLint 中 [规则](https://cn.eslint.org/docs/rules) 的名称。第一个值是错误级别，可以使下面的值之一：
+
+- `"off"` or `0` - 关闭规则
+- `"warn"` or `1` - 将规则视为一个警告（不会影响退出码）
+- `"error"` or `2` - 将规则视为一个错误 (退出码为1)
+
+这三个错误级别可以允许你细粒度的控制 ESLint 是如何应用规则（更多关于配置选项和细节的问题，请查看[配置文件](https://cn.eslint.org/docs/user-guide/configuring)）
+
+行内写法：`/* eslint no-unused: off */`
+
+3. 编辑器错误提示插件
+
+eslint需要配合eslint库使用
+
+保存时自动修改：setting打开autofix
+
+插件：settings sync
+
+**配置settings sync**
+
+下载公共gist，gist id：3defb19cd4f9b9d4f12d85dd74117de8
+
+令牌：setting -> developer settings -> personal access tokens，如果没有设置token每次上传配置时都会产生新的gist
+
+执行命令下载配置（下载失败），执行命令重制扩展设置，重新上传配置
+
+分享配置：高级配置 -> 在公开gist上分享配置
+
+我自己生成的gist：b6a6415fa2c67356f9461828e1e17da3
+
+**extends**
+
+使用plugin扩展规则，比如eslint-plugin-vue
+
+### 前端自动化
+
+前端自动化是指前端代码的自动化构建，打包（工程化），测试及部署等流程，通常与CI，CD流程结合
+
+#### 持续集成
+
+定义
+
+推送代码后，执行一系列的构建打包测试，判断新代码是否能正常合并到原有代码中，保证程序能够正常运行
+
+ci/cd流程：持续集成，持续部署
+
+部署
+
+分类：云部署，私有化部署
+
+方案：
+
+docker容器
+
+- 私有仓库：harbor
+- 公有仓库：aliyun，daocloud，docker hub
+
+虚拟机环境
+
+物理机环境
+
+#### 工具
+
+##### jenkins
+
+**安装**
+
+docker安装
+
+备份还原
+
+**配置**
+
+用户权限
+
+gitlab对接
+
+全局工具
+
+**工作任务**
+
+任务配置
+
+pipeline
+
+其他ci/cd工具：travis ci，circle ci
+
