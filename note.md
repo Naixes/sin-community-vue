@@ -1205,7 +1205,7 @@ git diff
 
 ##### 模型
 
-![src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina](note.assets/src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina.jpeg)
+![note.assets/src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina](note.assets/src=http___git.oschina.net_jacarrichan_gittest_raw_master_git-workflow-commands.png&refer=http___git.oschina.jpeg)
 
 经典模型的问题：
 
@@ -1221,7 +1221,7 @@ git diff
 
 bug -> branch -> master -> pre branch -> target branch
 
-![截屏2021-03-15 下午2.04.43](note.assets/截屏2021-03-15 下午2.04.43.png)
+<img src="note.assets/截屏2021-03-15 下午2.04.43.png" alt="截屏2021-03-15 下午2.04.43" style="zoom:50%;" />
 
 
 
@@ -1233,7 +1233,7 @@ bug -> branch -> master -> pre branch -> target branch
 
 master -> stable -> branch -> bugfix -> version
 
-![截屏2021-03-15 下午2.28.24](note.assets/截屏2021-03-15 下午2.28.24.png)
+<img src="note.assets/截屏2021-03-15 下午2.28.24.png" alt="截屏2021-03-15 下午2.28.24" style="zoom:50%;" />
 
 ##### 分支管理和冲突处理
 
@@ -1746,13 +1746,50 @@ docker容器
 
 #### 工具
 
-![截屏2021-03-17 下午10.28.13](note.assets/截屏2021-03-17 下午10.28.13.png)
+<img src="note.assets/截屏2021-03-17 下午10.28.13.png" alt="截屏2021-03-17 下午10.28.13" style="zoom:50%;" />
 
 ##### Circle ci
 
 登录
 
-配置：
+配置：.circleci/config.yml
+
+```cmd
+version: 2.1
+# orbs:
+#   node: circleci/node@14.15.5
+workflows:
+  node-tests:
+    jobs:
+      # - node/test
+      build:
+        docker:
+          - image: circleci/node@14.15.5
+        branches:
+          only:
+            - master
+        steps:
+          # 配置拉取方式，在circleci的项目配置中的ssh key授权github生成user key及fingerprints，目的是为了操作github的私有化项目
+          - add_ssh_keys:
+              fingerprints:
+                - '4c:d9:43:37:e2:f3:a0:81:a9:98:63:be:b6:1b:ed:a9'
+          # 拉取master的代码，
+          - checkout
+          # 注意缩进，不能使用tab缩进
+          - run:
+              name: Install
+          	  command: yarn install
+          - run: 
+              name: Build
+          	  command: yarn build
+
+```
+
+> git变基：
+>
+> git rebase -i head~3 # 按照注释修改弹出的内容，可以修改提交说明，可以合并提交
+>
+> git push origin master -f # 强制提交，覆盖掉上一次提交
 
 ##### jenkins
 
