@@ -1754,6 +1754,8 @@ docker容器
 
 配置：.circleci/config.yml
 
+构建
+
 ```cmd
 # 2.1版本不知道什么原因配置文件会报错
 version: 2
@@ -1787,6 +1789,128 @@ version: 2
 > git rebase -i head~3 # 按照注释修改弹出的内容，可以修改提交说明，可以合并提交
 >
 > git push origin master -f # 强制提交，覆盖掉上一次提交
+
+优化：缓存node_modules
+
+部署
+
+```cmd
+# 2.1版本不知道什么原因配置文件会报错
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10
+    branches:
+      only:
+        - master
+    steps:
+      # 配置拉取方式，在circleci的项目配置中的ssh key授权github生成user key及fingerprints，目的是为了操作github的私有化项目
+      - add_ssh_keys:
+          fingerprints:
+            - '4c:d9:43:37:e2:f3:a0:81:a9:98:63:be:b6:1b:ed:a9'
+      # 拉取master的代码，
+      - checkout
+      # 使用缓存
+        - restore_cache:
+          keys:
+            - dependencies_naixes
+      # 注意缩进，不能使用tab缩进
+      - run:
+          name: Install
+          command: yarn install
+      # 添加缓存
+      - save_cache:
+          paths: 
+            - node_modules
+          key: dependencies_naixes
+      - run:
+          name: Build
+          command: yarn build
+      # 部署
+      - run: 
+          name: Prepare Deploy
+          # shell chmod +x 赋予执行权限
+          command: shell chmod +x scripts/deploy.sh
+      - run: 
+          name: Run Deploy to Github pages
+          # 执行shell脚本
+          command: ./scripts/deploy.sh
+
+```
+
+shell脚本
+
+```sh
+#!/bin/sh
+# 构想 https://gist.github.com/motemen/8595451
+
+# 基于 https://github.com/eldarlabs/ghpages-deploy-script/blob/master/scripts/deploy-ghpages.sh
+# MIT许可 https://github.com/eldarlabs/ghpages-deploy-script/blob/master/LICENSE
+
+# abort the script if there is a non-zero error
+set -e
+
+# 打印当前的工作路径
+pwd
+remote=$(git config remote.origin.url)
+
+echo 'remote is: '$remote
+
+# 新建一个发布的目录
+mkdir gh-pages-branch
+cd gh-pages-branch
+# 创建的一个新的仓库
+# 设置发布的用户名与邮箱
+git config --global user.email "$GH_EMAIL" >/dev/null 2>&1
+git config --global user.name "$GH_NAME" >/dev/null 2>&1
+git init
+git remote add --fetch origin "$remote"
+
+echo 'email is: '$GH_EMAIL
+echo 'name is: '$GH_NAME
+echo 'sitesource is: '$siteSource
+
+# 切换gh-pages分支
+if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+  git checkout gh-pages
+  # 删除掉旧的文件内容
+  git rm -rf .
+else
+  git checkout --orphan gh-pages
+fi
+
+# 把构建好的文件目录给拷贝进来
+cp -a "../${siteSource}/." .
+
+ls -la
+
+# 把所有的文件添加到git
+git add -A
+# 添加一条提交内容
+git commit --allow-empty -m "Deploy to GitHub pages [ci skip]"
+# 推送文件
+git push --force --quiet origin gh-pages
+# 资源回收，删除临时分支与目录
+cd ..
+rm -rf gh-pages-branch
+
+echo "Finished Deployment!"
+
+```
+
+在circleci中的项目设置中添加环境变量
+
+配置vue项目的publicPath
+
+```js
+module.exports = {
+  publicPath: process.env.NODE_ENV === 'prod' ? '/sin-community-vue-fe' : '',
+  ...
+};
+```
+
+
 
 ##### jenkins
 
