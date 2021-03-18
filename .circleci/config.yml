@@ -15,7 +15,7 @@ jobs:
       # 拉取master的代码，
       - checkout
       # 使用缓存
-        - restore_cache:
+      - restore_cache:
           keys:
             - dependencies_naixes
       # 注意缩进，不能使用tab缩进
@@ -24,18 +24,18 @@ jobs:
           command: yarn install
       # 添加缓存
       - save_cache:
-          paths: 
+          paths:
             - node_modules
           key: dependencies_naixes
       - run:
           name: Build
           command: yarn build
       # 部署
-      - run: 
+      - run:
           name: Prepare Deploy
           # shell chmod +x 赋予执行权限
           command: shell chmod +x scripts/deploy.sh
-      - run: 
+      - run:
           name: Run Deploy to Github pages
           # 执行shell脚本
           command: ./scripts/deploy.sh
