@@ -1294,6 +1294,8 @@ docker logs -f gitlab
 
 ##### 配置
 
+密码：1-8
+
 ```cmd
 # 配置参考docker-gitlab
 # docker-compose.yml
@@ -1910,21 +1912,174 @@ module.exports = {
 };
 ```
 
+##### Travis ci
 
+官网授权登录，同步项目，支持的云平台比circle ci多
+
+配置文件.travis.yml，配置比circle ci简洁
+
+> 参考文档中job的生命周期，可以结合gulp使用
+
+默认缓存npm，yarn需要设置
+
+部署：设置token，根据文档配置deploy
+
+```yml
+language: node_js
+node_js:
+  - "10"
+
+cache:
+  yarn: true
+
+install:
+  - yarn install
+
+script:
+  - npm run build
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: dist/
+  github_token: $GITHUB_TOKEN # Set in the settings page of your repository, as a secure variable
+  keep_history: false
+  name: brian
+  email: brian@toimc.com
+  on:
+    branch: master
+
+```
 
 ##### jenkins
 
-**安装**
+java编写，支持本地部署
 
-docker安装
+持续集成持续交付，简易安装，配置简单，插件，扩展，分布式
 
-备份还原
+blue ocean：jenkins流水线平台，图形化操作，有一定学习成本
 
-**配置**
+docker hub中搜索jenkins，找到jenkins/jenkins
 
-用户权限
+流程：正常情况下在三个机器中运行的
 
-gitlab对接
+<img src="note.assets/截屏2021-03-18 下午3.37.04.png" alt="截屏2021-03-18 下午3.37.04" style="zoom:50%;" />
+
+远程发布/部署：
+
+- 远程使用shell脚本发布（镜像/rsync直传）
+- docker远程发布/rancher集群管理/k8s高可用
+- jenkins插件发布
+
+**搭建要求**
+
+测试：ram > 256m，DISK > 1G
+
+团队：ram > 1G，DISK > 50G
+
+docker包或者war包运行
+
+###### 安装
+
+docker安装：`docker run --name jenkins_naixes -p 13810:8080 -itd -p 50000:50000 jenkins/jenkins:lts // -itd增加交互式终端并且让这句docker命令在后台执行`
+
+> docker ps -a | grep xxx # 检索xxx容器，-a在所有容器中检索，不加是在运行容器中检索
+>
+> docker rm xxx # 删除容器
+
+```cmd
+# 查看log，复制生成的密码：743eb4ad89134f998f6d6375cb47104f
+docker logs -f jenkins_naixes
+# 放行
+firewall-cmd --add-port=13810/tcp --permanent
+firewall-cmd --reload
+# 在浏览器上访问，输入密码解锁jenkins
+```
+
+安装推荐插件，创建管理员用户（naixes+hkr），保存jenkins URL（http://192.168.1.7:13810/），开始使用jenkins
+
+> 离线方式安装插件：
+>
+> manage jenkins -> manage plugins -> available
+>
+> 内网：
+>
+> 在官网下载插件，上传插件
+
+配置加速源：https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+
+在advanced下面配置update site
+
+安装常用插件：git client，gitlab
+
+###### 备份还原
+
+方式一：打包成镜像，包含数据
+
+```cmd
+docker commit dockerid outputname
+docker images | grep putputname
+# 运行并且映射数据目录
+docker run -itd -v /tmp:/tmp putputname
+# 交互式终端链接到容器，在容器内部拷贝文件到宿主机的tmp目录，dockername是随机名称需要docker ps | grep outputname自己查看
+docker exec -it dockername cp -r /var/jenkins_home /tmp
+# 切换到tmp目录，将数据移动到其他目录进行持久化
+mv path
+docker stop dockername && docker rm dockername
+```
+
+方式二：https://docs.docker.com/storage/volumes/
+
+```cmd
+docker run --rm --volumes-from jenkins_naixes -v /tmp/backup:/backup ubuntu tar cvf /backup/backup.tar /var/jenkins_home
+# 进入目录/tmp/backup，解压
+tar cvf /backup/backup.tar
+# 移动
+mv path
+```
+
+方式三：
+
+```cmd
+# 拷贝
+docker cp dockerid:/var/jenkins_home /tmp/
+```
+
+###### 权限管理
+
+系统管理 -> 全局安全配置 -> 安全域（能否访问权限）授权策略（访问内容权限）
+
+使用插件：PAM Authentication，Matrix Authorization Strategy，Role-based Authorization Strategy，LDAP，Gitlab Authentication，GitHub
+
+> 其他插件：SSH Build Agents（分布式管理），WMI Windows Agents，build timeout，Dashboard View（图形界面），folders，ThinBackup（备份jenkins），ansiColor， build with parameters
+
+授权策略：
+
+- 勾选 `Role-Based Strategy` 保存后进入 `manage and assign roles` 配置`Manage Roles`和`assign roles`
+
+- 安全矩阵与项目矩阵授权策略类似（**选择这个注意必须添加当前用户！！！**）
+
+- gitlab方式，不用单独配置权限，同时还要修改安全域，gitlab中设置 -> 新建应用 -> 重定向url`http://192.168.1.7:13810/securityRealm/finishLogin`参考https://plugins.jenkins.io/gitlab-oauth/，勾选api，复制id和密码填到jenkins配置中，GitLab Web URI和GitLab API URI都是gitlab的路径地址 -> 保存 -> gitlab设置网络
+
+<img src="note.assets/截屏2021-03-18 下午6.54.23.png" alt="截屏2021-03-18 下午6.54.23" style="zoom:50%;" />新建用户进行测试
+
+###### gitlab对接
+
+配置公私钥对
+
+生成ssh`ssh-keygen -t rsa -b 4096 -C "615411375@qq.com" # passphrase: naixes`
+
+jenkins：添加全局凭据，配置私钥
+
+![截屏2021-03-18 下午7.48.16](note.assets/截屏2021-03-18 下午7.48.16.png)
+
+gitlab配置公钥：设置 -> 部署密钥 deploy -> 项目设置 仓库 -> Deploy keys 启用公开访问的部署密钥
+
+jenkins：项目配置 -> 源码管理 git -> 输入url选择前面配置的deploy，指定分支，配置构建触发，勾选build when a change is pushed to gitlab，高级配置，secret token点击generate，保存生成结果和webhook url
+
+gitlab：项目设置 -> 集成，填入secret token和webhook url，取消ssl vertification -> add webhook -> 配置集成 -> 执行shell
+
+
 
 全局工具
 
