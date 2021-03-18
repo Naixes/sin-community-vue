@@ -1,3 +1,4 @@
+# 2.1版本不知道什么原因配置文件会报错
 version: 2
 jobs:
   build:
@@ -7,10 +8,13 @@ jobs:
       only:
         - master
     steps:
+      # 配置拉取方式，在circleci的项目配置中的ssh key授权github生成user key及fingerprints，目的是为了操作github的私有化项目
       - add_ssh_keys:
           fingerprints:
             - '4c:d9:43:37:e2:f3:a0:81:a9:98:63:be:b6:1b:ed:a9'
+      # 拉取master的代码，
       - checkout
+      # 注意缩进，不能使用tab缩进
       - run:
           name: Install
           command: yarn install

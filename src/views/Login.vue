@@ -14,7 +14,7 @@
         <div
           class="layui-form layui-tab-content"
           id="LAY_ucm"
-          style="padding: 20px 0;"
+          style="padding: 20px 0"
         >
           <div class="layui-tab-item layui-show">
             <div class="layui-form layui-form-pane">
@@ -105,7 +105,7 @@
                   <button class="layui-btn" lay-filter="*" lay-submit>
                     立即登录
                   </button>
-                  <span style="padding-left:20px;">
+                  <span style="padding-left: 20px">
                     <router-link :to="{ name: 'Forget' }">
                       忘记密码？
                     </router-link>
@@ -143,7 +143,7 @@ export default {
       svg: "",
       email: "",
       password: "",
-      captcha: ""
+      captcha: "",
     };
   },
 
@@ -158,13 +158,13 @@ export default {
   methods: {
     _getCaptcha() {
       console.log("111");
-      getCaptcha().then(res => {
+      getCaptcha().then((res) => {
         if (res.code === 200) {
           this.svg = res.data;
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

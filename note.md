@@ -1755,11 +1755,8 @@ docker容器
 配置：.circleci/config.yml
 
 ```cmd
-version: 2.1
-# orbs:
-#   node: circleci/node@14.15.5
-workflows:
-  node-tests:
+# 2.1版本不知道什么原因配置文件会报错
+version: 2
     jobs:
       # - node/test
       build:

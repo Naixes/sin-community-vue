@@ -13,7 +13,7 @@
         <div
           class="layui-form layui-tab-content"
           id="LAY_ucm"
-          style="padding: 20px 0;"
+          style="padding: 20px 0"
         >
           <div class="layui-tab-item layui-show">
             <!-- 重置密码 -->
@@ -129,7 +129,7 @@ export default {
     return {
       email: "",
       svg: "",
-      captcha: ""
+      captcha: "",
     };
   },
 
@@ -143,7 +143,7 @@ export default {
 
   methods: {
     _getCaptcha() {
-      getCaptcha().then(res => {
+      getCaptcha().then((res) => {
         if (res.code === 200) {
           this.svg = res.data;
         }
@@ -152,15 +152,15 @@ export default {
     submit() {
       const params = {
         email: this.email,
-        captcha: this.captcha
+        captcha: this.captcha,
       };
-      forget(params).then(res => {
+      forget(params).then((res) => {
         if (res.code === 200) {
           alert(res.msg);
         }
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

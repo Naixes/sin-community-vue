@@ -12,7 +12,7 @@
         <div
           class="layui-form layui-tab-content"
           id="LAY_ucm"
-          style="padding: 20px 0;"
+          style="padding: 20px 0"
         >
           <div class="layui-tab-item layui-show">
             <div class="layui-form layui-form-pane">
@@ -96,7 +96,7 @@
                     />
                   </div>
                   <div class="layui-form-mid">
-                    <span style="color: #c00;">Naixes hello</span>
+                    <span style="color: #c00">Naixes hello</span>
                   </div>
                 </div>
                 <div class="layui-form-item">
@@ -140,7 +140,7 @@ export default {
 
   mounted: {},
 
-  methods: {}
+  methods: {},
 };
 </script>
 <style lang="scss" scoped></style>
