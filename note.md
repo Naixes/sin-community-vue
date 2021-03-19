@@ -2208,3 +2208,17 @@ EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
 ```
 
+配置好docker file后测试：
+
+```cmd
+# 前端项目执行
+# -t: tag
+docker build -t web:1.0 .
+
+docker images
+docker run -itd --name web -p 11000:80 web:1.0
+docker ps
+docker logs -f web
+# 浏览器中打开localhost:11000测试
+```
+

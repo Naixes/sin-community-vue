@@ -1,5 +1,5 @@
 # build stage
-FROM node:lts-alpine as build-stage
+FROM node:14.15.5 as build-stage
 
 # 设置维护者
 LABEL maintainer=naixes
