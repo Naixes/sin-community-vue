@@ -14,7 +14,7 @@ Vue.config.productionTip = false
 axios.defaults.baseURL =
   process.env.NODE_ENV !== 'prod'
     ? 'http://localhost:3000'
-    : 'http://url.domain.com'
+    : 'http://192.168.1.7:12005'
 
 new Vue({
   router,

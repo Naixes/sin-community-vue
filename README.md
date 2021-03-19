@@ -19,3 +19,7 @@ Vue2+koa2
 使用moment处理时间
 
 使用showdoc本地化部署接口文档管理
+
+使用本地化部署的gitlab作为版本管理
+
+使用本地化部署的jenkins+dockerfile作为ci/cd工具，对接gitlab

@@ -2079,3 +2079,132 @@ jenkins：项目配置 -> 源码管理 git -> 输入url选择前面配置的depl
 
 gitlab：项目设置 -> 集成，填入secret token和webhook url，取消ssl vertification -> add webhook -> 配置集成 -> 执行shell（shell脚本配合docker和dockerfile）
 
+#### 实战
+
+##### docker容器文件系统
+
+分层系统，写时复制
+
+一个命令就是一层，产生一些文件
+
+<img src="note.assets/截屏2021-03-19 上午9.51.54.png" alt="截屏2021-03-19 上午9.51.54" style="zoom:50%;" />
+
+##### docker file
+
+- 用于产生docker镜像
+- 按照步骤构建，产生文件系统
+- 镜像的配置文件
+
+https://docs.docker.com/engine/reference/builder/
+
+.dockerignore file
+
+Here is an example `.dockerignore` file:
+
+```gitignore
+# comment
+*/temp*
+*/*/temp*
+temp?
+```
+
+some examples of Dockerfile syntax.
+
+```cmd
+# 1
+# Nginx
+#
+# VERSION               0.0.1
+
+# 基础镜像
+FROM      ubuntu
+LABEL Description="This image is used to start the foobar executable" Vendor="ACME Products" Version="1.0"
+RUN apt-get update && apt-get install -y inotify-tools nginx apache2 openssh-server
+
+# 2
+# Firefox over VNC
+#
+# VERSION               0.3
+
+FROM ubuntu
+
+# Install vnc, xvfb in order to create a 'fake' display and firefox
+RUN apt-get update && apt-get install -y x11vnc xvfb firefox
+RUN mkdir ~/.vnc
+# Setup a password
+RUN x11vnc -storepasswd 1234 ~/.vnc/passwd
+# Autostart firefox (might not be the best way, but it does the trick)
+RUN bash -c 'echo "firefox" >> /.bashrc'
+
+# 端口映射
+EXPOSE 5900
+# 执行脚本
+CMD    ["x11vnc", "-forever", "-usepw", "-create"]
+
+
+# 3
+# Multiple images example
+#
+# VERSION               0.1
+
+FROM ubuntu
+RUN echo foo > bar
+# Will output something like ===> 907ad6c2736f
+
+FROM ubuntu
+RUN echo moo > oink
+# Will output something like ===> 695d7793cbe4
+
+# You'll now have two images, 907ad6c2736f with /bar, and 695d7793cbe4 with
+# /oink.
+```
+
+vue提供的docker file
+
+https://cn.vuejs.org/v2/cookbook/dockerize-vuejs-app.html
+
+Let’s start by creating a `Dockerfile` in the root folder of our project:
+
+```cmd
+FROM node:lts-alpine
+
+# install simple http server for serving static content
+RUN npm install -g http-server
+
+# make the 'app' folder the current working directory
+WORKDIR /app
+
+# copy both 'package.json' and 'package-lock.json' (if available)
+COPY package*.json ./
+
+# install project dependencies
+RUN npm install
+
+# copy project files and folders to the current working directory (i.e. 'app' folder)
+COPY . .
+
+# build app for production with minification
+RUN npm run build
+
+EXPOSE 8080
+CMD [ "http-server", "dist" ]
+```
+
+真实例子，Let’s refactor our `Dockerfile` to use NGINX:
+
+```cmd
+# build stage
+FROM node:lts-alpine as build-stage
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+# production stage
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
