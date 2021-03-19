@@ -136,36 +136,36 @@
 </template>
 
 <script>
-import { getCaptcha } from "@/api/login.js";
+import { getCaptcha } from '@/api/login.js'
 export default {
-  data() {
+  data () {
     return {
-      svg: "",
-      email: "",
-      password: "",
-      captcha: "",
-    };
+      svg: '',
+      email: '',
+      password: '',
+      captcha: ''
+    }
   },
 
   components: {},
 
   computed: {},
 
-  mounted() {
-    this._getCaptcha();
+  mounted () {
+    this._getCaptcha()
   },
 
   methods: {
-    _getCaptcha() {
-      console.log("111");
+    _getCaptcha () {
+      console.log('111')
       getCaptcha().then((res) => {
         if (res.code === 200) {
-          this.svg = res.data;
+          this.svg = res.data
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .svg {

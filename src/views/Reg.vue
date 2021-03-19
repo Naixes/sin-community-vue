@@ -130,8 +130,8 @@
 
 <script>
 export default {
-  data() {
-    return {};
+  data () {
+    return {}
   },
 
   components: {},
@@ -140,7 +140,7 @@ export default {
 
   mounted: {},
 
-  methods: {},
-};
+  methods: {}
+}
 </script>
 <style lang="scss" scoped></style>

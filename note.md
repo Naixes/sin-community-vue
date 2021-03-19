@@ -2061,7 +2061,7 @@ docker cp dockerid:/var/jenkins_home /tmp/
 
 - gitlab方式，不用单独配置权限，同时还要修改安全域，gitlab中设置 -> 新建应用 -> 重定向url`http://192.168.1.7:13810/securityRealm/finishLogin`参考https://plugins.jenkins.io/gitlab-oauth/，勾选api，复制id和密码填到jenkins配置中，GitLab Web URI和GitLab API URI都是gitlab的路径地址 -> 保存 -> gitlab设置网络
 
-<img src="note.assets/截屏2021-03-18 下午6.54.23.png" alt="截屏2021-03-18 下午6.54.23" style="zoom:50%;" />新建用户进行测试
+<img src="note.assets/截屏2021-03-18 下午6.54.23.png" alt="截屏2021-03-18 下午6.54.23" style="zoom:50%;" />
 
 ###### gitlab对接
 
@@ -2077,17 +2077,5 @@ gitlab配置公钥：设置 -> 部署密钥 deploy -> 项目设置 仓库 -> Dep
 
 jenkins：项目配置 -> 源码管理 git -> 输入url选择前面配置的deploy，指定分支，配置构建触发，勾选build when a change is pushed to gitlab，高级配置，secret token点击generate，保存生成结果和webhook url
 
-gitlab：项目设置 -> 集成，填入secret token和webhook url，取消ssl vertification -> add webhook -> 配置集成 -> 执行shell
-
-
-
-全局工具
-
-**工作任务**
-
-任务配置
-
-pipeline
-
-其他ci/cd工具：travis ci，circle ci
+gitlab：项目设置 -> 集成，填入secret token和webhook url，取消ssl vertification -> add webhook -> 配置集成 -> 执行shell（shell脚本配合docker和dockerfile）
 

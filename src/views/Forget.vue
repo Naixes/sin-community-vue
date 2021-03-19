@@ -51,7 +51,6 @@
             </form>
           </div>
 
-
           <div class="fly-error">该重置密码链接已失效，请重新校验您的信息</div>
           <div class="fly-error">非法链接，请重新校验您的信息</div>
           -->
@@ -123,45 +122,45 @@
 </template>
 
 <script>
-import { getCaptcha, forget } from "@/api/login.js";
+import { getCaptcha, forget } from '@/api/login.js'
 export default {
-  data() {
+  data () {
     return {
-      email: "",
-      svg: "",
-      captcha: "",
-    };
+      email: '',
+      svg: '',
+      captcha: ''
+    }
   },
 
   components: {},
 
   computed: {},
 
-  mounted() {
-    this._getCaptcha();
+  mounted () {
+    this._getCaptcha()
   },
 
   methods: {
-    _getCaptcha() {
+    _getCaptcha () {
       getCaptcha().then((res) => {
         if (res.code === 200) {
-          this.svg = res.data;
+          this.svg = res.data
         }
-      });
+      })
     },
-    submit() {
+    submit () {
       const params = {
         email: this.email,
-        captcha: this.captcha,
-      };
+        captcha: this.captcha
+      }
       forget(params).then((res) => {
         if (res.code === 200) {
-          alert(res.msg);
+          alert(res.msg)
         }
-      });
-    },
-  },
-};
+      })
+    }
+  }
+}
 </script>
 <style lang="scss" scoped>
 .svg {
