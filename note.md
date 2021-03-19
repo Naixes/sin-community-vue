@@ -2065,7 +2065,7 @@ docker cp dockerid:/var/jenkins_home /tmp/
 
 ###### gitlab对接
 
-配置公私钥对
+**配置公私钥对**
 
 生成ssh`ssh-keygen -t rsa -b 4096 -C "615411375@qq.com" # passphrase: naixes`
 
@@ -2075,9 +2075,15 @@ jenkins：添加全局凭据，配置私钥
 
 gitlab配置公钥：设置 -> 部署密钥 deploy -> 项目设置 仓库 -> Deploy keys 启用公开访问的部署密钥
 
-jenkins：项目配置 -> 源码管理 git -> 输入url选择前面配置的deploy，指定分支，配置构建触发，勾选build when a change is pushed to gitlab，高级配置，secret token点击generate，保存生成结果和webhook url
+**配置webhook**
 
-gitlab：项目设置 -> 集成，填入secret token和webhook url，取消ssl vertification -> add webhook -> 配置集成 -> 执行shell（shell脚本配合docker和dockerfile）
+jenkins：项目任务配置 -> 源码管理 git -> 输入gitlab项目的ssh对应的url选择前面配置的deploy，指定分支，配置构建触发，勾选build when a change is pushed to gitlab，高级配置，secret token点击generate，保存生成结果和webhook url
+
+gitlab：项目设置 -> 集成，填入secret token和webhook url（http://192.168.1.7:13810/project/sin-community-vue-fe，保存失败时可以试试如上配置网络），取消ssl vertification -> add webhook -> 配置集成 -> 执行shell（shell脚本配合docker和dockerfile）
+
+jenkins的流程就和配置显示的流程一致：
+
+#### <img src="note.assets/截屏2021-03-19 下午3.37.41.png" alt="截屏2021-03-19 下午3.37.41" style="zoom:50%;" />
 
 #### 实战
 
@@ -2220,5 +2226,53 @@ docker run -itd --name web -p 11000:80 web:1.0
 docker ps
 docker logs -f web
 # 浏览器中打开localhost:11000测试
+```
+
+配置gitlab和jenkins对接
+
+配置shell脚本：
+
+```shell
+#!/bin/bash
+
+CONTAINER=${container_name}
+PORT=${port}
+
+# 完成镜像构建
+docker build --no-cache -t ${image_name}:${tag}
+
+
+# 
+RUNNING=${docker inspect --format="{{.State.Running}}" $CONTAINER 2 > /dev/null}
+
+
+# 判断是否存在
+if [ ! -n $RUNNING ]; then
+ echo "$CONTAINER does not exit"
+ return 1
+fi
+
+if ["$RUNNING" == "false"]; then
+ echo "$CONTAINNER is not running"
+ return 2
+else 
+ echo "$CONTAINER is running"
+ # delete same name container
+ matchingStarted=${docker ps --filter="name=$CONTAINER" -q | xargs}
+ if [-n $matchingStarted]; then
+  docker stop $matchingStarted
+ fi
+ 
+ matching=${docker ps -a --filter="name=$CONTAINER" -q | xargs}
+ if [-n $matching]; then
+  docker rm $matching
+ fi
+fi
+
+echo "RUNNING is ${RUNNING}"
+
+# 跑起来服务，.表示使用当前目录下的docker file文件
+docker run -itd --name $CONTAINER -p $PORT:80 ${image_name}:${tag} .
+
 ```
 
