@@ -1,31 +1,13 @@
-import axios from 'axios'
+import axios from '@/utils/request'
 
 const getCaptcha = async () => {
-  let result = null
-  try {
-    result = await axios.get('/getCaptcha')
-    if (result.status === 200) {
-      return result.data
-    }
-  } catch (error) {
-    console.log(error)
-  }
-  return result
+  return axios.get('/getCaptcha')
 }
 
 const forget = async (params) => {
-  let result = null
-  try {
-    result = await axios.post('/forget', {
-      ...params
-    })
-    if (result.status === 200) {
-      return result.data
-    }
-  } catch (error) {
-    console.log(error)
-  }
-  return result
+  return axios.post('/forget', {
+    ...params
+  })
 }
 
 export { getCaptcha, forget }

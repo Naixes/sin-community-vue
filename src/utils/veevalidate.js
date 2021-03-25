@@ -1,15 +1,12 @@
 import Vue from 'vue'
 import { extend, localize } from 'vee-validate'
-import { required, email, min } from 'vee-validate/dist/rules'
+import { required, email, min, confirmed, length } from 'vee-validate/dist/rules'
 
-// Install required rule.
 extend('required', required)
-
-// Install email rule.
 extend('email', email)
-
-// Install email rule.
 extend('min', min)
+extend('length', length)
+extend('confirmed', confirmed)
 
 // 激活中文
 localize('zh-CN')

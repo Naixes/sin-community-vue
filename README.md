@@ -6,7 +6,7 @@ Vue2+koa2
 
 - 用户输入验证
 - 拦截非正常登录请求
-- 登录验证（token）
+- 登录验证（token），统计信息
 
 使用layui框架完成样式布局
 
@@ -23,3 +23,9 @@ Vue2+koa2
 使用本地化部署的gitlab作为版本管理
 
 使用本地化部署的jenkins+dockerfile作为ci/cd工具，对接gitlab
+
+使用mongoDB作为数据库
+
+使用bcrypt加密敏感数据
+
+使用jwt方式鉴权

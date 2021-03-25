@@ -1996,6 +1996,8 @@ firewall-cmd --reload
 # 在浏览器上访问，输入密码解锁jenkins
 ```
 
+###### 插件安装
+
 安装推荐插件，创建管理员用户（naixes+hkr），保存jenkins URL（http://192.168.1.7:13810/），开始使用jenkins
 
 > 离线方式安装插件：
@@ -2010,7 +2012,7 @@ firewall-cmd --reload
 
 在advanced下面配置update site
 
-安装常用插件：git client，gitlab
+安装常用插件：git client（已安装），gitlab
 
 ###### 备份还原
 
@@ -2275,4 +2277,441 @@ echo "RUNNING is ${RUNNING}"
 docker run -itd --name $CONTAINER -p $PORT:80 ${image_name}:${tag} .
 
 ```
+
+## NoSQL
+
+意义
+
+- 易扩展（数据结构不固定），高性能，高可用
+- 较容易映射复杂数据（key-value）
+- 无事物特性要求（ACID特性：原子性，一致性，独立性，持久性，mondodb4以上有）
+
+数据库分类
+
+1. 文件型：简单，适合单机存储少量数据---access，sqlite
+2. 关系型：采用关系模型来组织数据的数据库，功能强大，逻辑清晰，性能相对低---MySQL，Oracle，access，SQL server
+3. 非关系型：---mongoDB（文档类型），memcache/redis（高速缓存，key/value类型）
+4. 分布式：安全性高---mongoDB
+5. NoSQL：对不同于传统的关系型数据库的统称，现在是指非关系型分布式不遵循ACID原则的数据库，简单功能性能高---memcache，redis
+
+### **数据库设计**
+
+错误：使用字符存日期，冗余记录，糟糕的索引，糟糕的文档，错误的命名约定，所有域值
+
+设计工具：在线，dbdiagram，draw，lucidchart，sqldbm，quickdbd，客户端，sqlgate，dbeaver，mysql workbench，sql power architect
+
+**常见场景及设计方法：内嵌，父/子引用，反范式**
+
+#### 内嵌
+
+存在关联关系的文档，放在同一文档中，以数组的形式存放，适用于一对少
+
+减少了关联查询，适合于单类需要描述的属性，**不经常变化**的属性（扩展，嵌套关联）
+
+#### 父/子引用
+
+指在一对多的情况中，放在同一文档中，以数组的形式存放
+
+指在一对非常多的情况中，放在同一文档中，由于文档存放限制，进行反向引用
+
+引用数据非常多，引用数据量庞大，数据需要单独访问
+
+#### 反范式
+
+范式是一种公认的模型和模式，反范式一般是通过数据的冗余提高某些场景下的效率，缺点难以更新
+
+是否需要提升性能，数据量的变化是否会庞大到影响更新性能，**先考虑读写比才考虑反范式**
+
+#### 原则
+
+- 优先考虑内嵌，单独访问不适合
+- 单独的对象，不应该内嵌到其他对象中
+- 数组不应该无限增长：考虑使用id引用，过多的引用需要考虑设计是否合理
+- 多层级的join
+- 确认读写比，考虑反范式
+- 考虑应用场景
+
+1对多场景
+
+- 内嵌：1对多少，直接内嵌
+- 子引用：1对多很多，反向嵌入
+- 父引用：一对多且单独需要处理时
+- 反范式：
+  - 1:n：属性与名称，考虑读取开销
+  - n:1：日志实例：ip，hostnanme，区域。考虑更新开销
+  - 场景：更新变的更复杂开销更大，读>写
+  - 优点：适合业务，某些场景效率更高
+  - 缺点：数据冗余，难以更新
+
+双向关联
+
+- 优点：添加属性快速定位，方便业务组成，便于统计
+- 缺点：无法保证原子性
+
+原子性：冗余字段失去原子性，业务独立
+
+### MongoDB
+
+#### 安装
+
+安装社区版mac：https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/
+
+In addition, the installation creates the following files and directories at the location specified below, depending on your Apple hardware:
+
+|                                                              | Intel Processor              | Apple M1 Processor              |
+| :----------------------------------------------------------- | :--------------------------- | :------------------------------ |
+| [configuration file](https://docs.mongodb.com/manual/reference/configuration-options/) | `/usr/local/etc/mongod.conf` | `/opt/homebrew/etc/mongod.conf` |
+| [`log directory`](https://docs.mongodb.com/manual/reference/configuration-options/#systemLog.path) | `/usr/local/var/log/mongodb` | `/opt/homebrew/var/log/mongodb` |
+| [`data directory`](https://docs.mongodb.com/manual/reference/configuration-options/#storage.dbPath) | `/usr/local/var/mongodb`     | `/opt/homebrew/var/mongodb`     |
+
+```cmd
+brew tap mongodb/brew
+brew install mongodb-community@4.4
+# 启动服务，默认配置
+brew services start mongodb-community@4.4
+# 关闭服务
+brew services stop mongodb-community@4.4
+# 指定配置文件启动，intel
+mongod --config /usr/local/etc/mongod.conf --fork
+# 连接
+mongo
+```
+
+配置文件说明：https://docs.mongodb.com/manual/reference/configuration-options/
+
+docker安装：dockerhub，https://hub.docker.com/_/mongo
+
+```yml
+# docker-compose.yml
+version: '3.1'
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    # 持久化
+    volumes:
+      - /home/mongotest:/data/db
+
+# =========================================== 
+# 运行
+docker-compose up -d
+firewall-cmd --add-port=27017/tcp --permanent
+firewall-cmd --reload
+```
+
+#### Robo 3t
+
+官网下载安装
+
+create，输入name和address，勾选鉴权选项，数据库名称
+
+#### 备份恢复
+
+```cmd
+# 备份
+docker exec -it dockername mongodump -h localhost -u username -p password -o /tmp/test # 容器内部路径
+docker cp dockerid:/tmp/test /tmp/test # 拷贝数据
+# 恢复
+docker exec -it dockername mongorestore -h localhost -u username -p password --dir /tmp/test # 宿主机路径，还需要挂载或者拷贝数据
+```
+
+#### mongoose
+
+<img src="note.assets/截屏2021-03-21 下午4.30.29.png" alt="截屏2021-03-21 下午4.30.29" style="zoom:50%;" />
+
+npm安装
+
+使用：配置，核心API
+
+核心概念：schema，model
+
+```js
+// getting-started.js
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://username:psw@localhost/dbname', {useNewUrlParser: true, useUnifiedTopology: true});
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function() {
+  // we're connected!
+});
+
+var kittySchema = mongoose.Schema({
+  name: String
+});
+// 译者注：注意了， method 是给 document 用的
+// NOTE: methods must be added to the schema before compiling it with mongoose.model()
+kittySchema.methods.speak = function () {
+  var greeting = this.name
+    ? "Meow name is " + this.name
+    : "I don't have a name";
+  console.log(greeting);
+}
+var Kitten = mongoose.model('Kitten', kittySchema);
+
+var felyne = new Kitten({ name: 'Felyne' });
+console.log(felyne.name); // 'Felyne'
+
+var fluffy = new Kitten({ name: 'fluffy' });
+fluffy.speak(); // "Meow name is fluffy"
+fluffy.save(function (err, fluffy) {
+  if (err) return console.error(err);
+  fluffy.speak();
+});
+Kitten.find(function (err, kittens) {
+  if (err) return console.error(err);
+  console.log(kittens);
+})
+// 这么写可以获取所有 name 为 "Fluff" 开头的数据
+Kitten.find({ name: /^fluff/ }, callback);
+```
+
+查看警告，消除警告
+
+优化结构
+
+增删改查
+
+排序
+
+多表联合查询
+
+#### 添加用户
+
+#### 配置权限
+
+### Redis
+
+遵循BSD协议，高性能key-value数据库
+
+高性能支持数据持久化，多数据结构，支持备份，支持事务数据的原子性
+
+应用：缓存（读写性能好），计数&消息系统（高并发，发布/订阅阻塞队列功能），分布式会话session&分布式锁（秒杀）
+
+对比
+
+储存方式：key-value/document
+
+使用方式&可靠性不一样：ACID支持/mongodb sql
+
+应用场景：高性能缓存/海量数据分析
+
+#### 安装
+
+docker，dockerhub`docker-compose up -d`使用docker-compose安装
+
+```yml
+# docker run安装
+# docker run -itd --restart=always -p 15001:6379 -v /home/redistest:/data redis
+
+# community/redis/docker-compose.yml
+version: '3.1'
+services:
+	redis-community:
+		image: 'redis'
+		restart: always
+		container_name: 'redis_community'
+		ports: 
+		  - 15001:6379
+		volumes: 
+		  - /home/community/redis:/data
+		# 设置默认密码
+		command: ['redis-server', '--requirepass', 'redispass']
+```
+
+默认配置https://github.com/redis/redis/blob/unstable/redis.conf，默认6379port
+
+#### redis cli
+
+命令参考：http://doc.redisfans.com/
+
+```cmd
+# 连接进启动好的redis服务中
+docker exec -it redis-test /bin/bash
+redis-cli 
+# 另外一种方法
+docker exec -it redis-test redis-cli
+# 设置了密码的话要使用auth输入密码
+auth 123456
+# 其他的连接方面的命令 echo，ping，quit，select（切换到指定数据库）
+# 其他常用命令
+# 递增
+INCR key
+# 递减
+DECR
+# 匹配keys
+KEYS /reg/
+# 存在
+EXISTS key1 key2 ...
+del key
+# hash
+hset key field value
+hget key field
+hgetall key
+hmset key field value field value field value
+# list
+lpop key
+rpop key
+lpush key value
+# set
+# 发布订阅
+subscribe channel channel
+publish channel massage
+# 服务器相关
+client list # 连接到服务的客户端，idle表示空闲时长
+client kill client
+# 用来记录查询时间的日志系统
+config set slowlog-log-slower-than 1000 # 查询时间大于1000毫秒的记录
+slowlog len # 查看日志数量
+slowlog reset
+# 清空数据库
+flushall # 清空所有数据库，慎重！！
+flushdb
+# 备份/恢复
+# SAVE 命令执行一个同步保存操作，将当前 Redis 实例的所有数据快照(snapshot)以 RDB 文件的形式保存到硬盘。一般来说，在生产环境很少执行 SAVE 操作，因为它会阻塞所有客户端，保存数据库的任务通常由 BGSAVE 命令异步地执行。然而，如果负责保存数据的后台子进程不幸出现问题时， SAVE 可以作为保存数据的最后手段来使用。
+save
+CONFIG get dir # 查看地址
+quit
+docker exec -it redis-test /bin/bash
+ls
+# rdb文件就是数据文件
+# 重启docker服务
+docker exec -it redis-test redis-cli -h 127.0.0.1 -a 123456
+```
+
+#### GUI
+
+**another redis desktop manager**（免费）
+
+medis（收费）
+
+redis desktop manager（收费）
+
+#### 集成redis
+
+安装库：redis
+
+https://github.com/NodeRedis/node-redis
+
+有用的参数参数：...detect_buffers: true, retry_strategy
+
+```js
+import redis from 'redis'
+
+const options = {
+    host: '192.168.1.7',
+    port: 15001,
+    password: 'redispass',
+    // If set to true, then replies will be sent to callbacks as Buffers. 
+    detect_buffers: true,
+    retry_strategy: function(options) {
+        if (options.error && options.error.code === "ECONNREFUSED") {
+            // End reconnecting on a specific error and flush all commands with
+            // a individual error
+            return new Error("The server refused the connection");
+        }
+        if (options.total_retry_time > 1000 * 60 * 60) {
+            // End reconnecting after a specific timeout and flush all commands
+            // with a individual error
+            return new Error("Retry time exhausted");
+        }
+        if (options.attempt > 10) {
+            // End reconnecting with built in error
+            return undefined;
+        }
+        // reconnect after
+        return Math.min(options.attempt * 100, 3000);
+    },
+}
+
+const client = redis.createClient(options)
+
+const setValue = (key, value) => {
+    if(typeof value === 'undefined' || value == null || value === '') {
+        return
+    }
+    if(typeof value === 'string') {
+        client.set(key, value)
+    }else if(typeof value === 'object') {
+        Object.keys(value).forEach(item => {
+            client.hset(key, item, value[item], redis.print)
+        })
+    }
+}
+
+const { promisify } = require("util");
+const getAsync = promisify(client.get).bind(client);
+const getValue = (key) => {
+    return getAsync(key)
+}
+
+const getHValue = (key) => {
+    return promisify(client.hgetall).bind(client)(key)
+}
+
+export {
+    client,
+    setValue,
+    getValue,
+    getHValue
+}
+
+```
+
+将get转换为异步：方法一，util的proisify，方法二，bluebird
+
+## JWT
+
+### 鉴权
+
+jwt
+
+易扩展，支持移动设备，跨应用调用，安全，信息丰富
+
+刷新与过期处理，payload不易过大（性能），中间人攻击
+
+session/cookie
+
+传统，后台系统常用，依赖koa-session，redis，bluebird
+
+易扩展，简单
+
+安全性低，性能低，服务端存储，多服务器同步困难，跨平台困难
+
+oauth
+
+第三方登录
+
+开放，安全简单，权限指定
+
+需要增加授权服务器，增加网络请求
+
+### jwt原理
+
+json web token，一个jwt由三部分组成：header加密方式及token类型，payload用户信息等，signature（加密header的base64+.+payload的base64+secret）
+
+特点：防止csrf（防止伪造请求），适合移动端，无状态，
+
+jwt.io
+
+客户端请求服务端login，验证后返回token，再请求时带上token，服务器验证token返回数据
+
+保证安全：加密信道
+
+#### API安全设计
+
+通信信道加密：https（对称加密）
+
+通信数据加密：密文+加密关键数据
+
+通信安全策略：授权中间层，尝试次数，过期策略，多次鉴权...
+
+### node集成
+
+koa-jwt
 
