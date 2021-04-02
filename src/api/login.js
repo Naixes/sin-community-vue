@@ -1,7 +1,7 @@
 import axios from '@/utils/request'
 
-const getCaptcha = async () => {
-  return axios.get('/getCaptcha')
+const getCaptcha = async (sid) => {
+  return axios.get('/getCaptcha', { sid })
 }
 
 const forget = async (params) => {

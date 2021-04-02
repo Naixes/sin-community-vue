@@ -52,11 +52,11 @@ class HttpRequest {
     return instance(newOptions)
   }
 
-  get (url, config) {
+  get (url, params) {
     const options = Object.assign({
       method: 'get',
       url
-    }, config)
+    }, params)
     return this.request(options)
   }
 

@@ -137,13 +137,15 @@
 
 <script>
 import { getCaptcha } from '@/api/login.js'
+import { v4 as uuidv4 } from 'uuid'
 export default {
   data () {
     return {
       svg: '',
       email: '',
       password: '',
-      captcha: ''
+      captcha: '',
+      username: ''
     }
   },
 
@@ -152,13 +154,19 @@ export default {
   computed: {},
 
   mounted () {
-    this._getCaptcha()
+    let sid = ''
+    if (localStorage.getItem('sid')) {
+      sid = localStorage.getItem('sid')
+    } else {
+      sid = uuidv4()
+      localStorage.setItem('sid', sid)
+    }
+    this._getCaptcha(sid)
   },
 
   methods: {
-    _getCaptcha () {
-      console.log('111')
-      getCaptcha().then((res) => {
+    _getCaptcha (sid) {
+      getCaptcha(sid).then((res) => {
         if (res.code === 200) {
           this.svg = res.data
         }
