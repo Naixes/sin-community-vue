@@ -28,5 +28,29 @@ Vue2+koa2
 
 使用bcrypt加密敏感数据
 
-使用jwt方式鉴权：前端生成唯一标识符（uuid），后端通过redis将标识符和验证码对应起来（存储），通过标识符进行鉴权
+使用jwt方式鉴权：
 
+- 前端生成唯一标识符（uuid），后端通过redis将标识符和验证码对应起来（存储），通过标识符进行鉴权
+
+- 鉴权库：koa-jwt库https://www.npmjs.com/package/koa-jwt
+
+- common/errHandle错误处理
+
+- 产生校验token：jsonwebtoken库
+
+  请求头：Authorization: Bearer token
+
+> npm-run-all：运行多个脚本
+>
+> 提供了三个命令
+>
+> npm-run-all：参数 -s，-p
+>
+> run-s：串行
+>
+> run-p：并行
+
+- 验证验证码和用户名密码
+- 前端校验，使用vue插件系统和自定义组件完成错误提示
+
+> 调试小技巧：mounted中window.vue = this，就可以在浏览器查看或操作

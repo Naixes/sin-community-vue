@@ -4,8 +4,15 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    // 登录验证码的sid
+    sid: ''
+  },
+  mutations: {
+    setSid (state, value) {
+      state.sid = value
+    }
+  },
   actions: {},
   modules: {}
 })

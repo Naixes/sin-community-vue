@@ -78,11 +78,11 @@
 
 计划---编码---打包---发布测试---发布正式版本---运维---监控
 
-![devops流程](./images/devops流程.jpg)
+![devops流程](./note.assets/devops流程.jpg)
 
 详细流程
 
-![devops全流程](./images/devops全流程.png)
+![devops全流程](./note.assets/devops全流程.png)
 
 #### 需求分析
 
@@ -446,13 +446,13 @@ sh get-docker.sh
 
 win10以上以及windows server都是有默认的hyper-v组件
 
-- **mac：Parrallels Desktop**
+- **mac：Parrallels Desktop，vmware**
 
-安装centos7镜像7.6 1810 DVD版，ctrl+option释放光标：选择时区，选择语言，INSTALLATION（done），SOFTWARE（Virtualization Host全选），NETWORK（ON，Config配置网络默认），BEGIN INSTALL，设置密码（设置的最常用的那个密码），Rebot，登录输入root和密码
+安装centos7镜像7.6 1810 DVD版，ctrl+option释放光标：选择时区，选择语言，INSTALLATION（done），SOFTWARE（Virtualization Host全选），NETWORK（ON，Config配置网络默认），BEGIN INSTALL，设置密码（同本机密码），Rebot，登录输入root和密码
+
+配置静态ip：https://www.cnblogs.com/itbsl/p/10998696.html
 
 注意：最开始要选择英文
-
-> 安装7.9 2009DVD版：
 
 - **Linux：Hypervisor**
 
@@ -480,6 +480,25 @@ Ubuntu：基于Debain，桌面版新手友好
 
 - **目录结构**
 
+  | 目录  | 应放置档案内容                                               |
+  | ----- | ------------------------------------------------------------ |
+  | /bin  | 命令，包含了大部分命令。系统有很多放置执行档的目录，但/bin⽐较特殊。因为/bin放置的是在单人维护模式 还能够被操作的指令。在/bin底下的指令可以被root与一般帐号所使用，主要有: cat,chmod(修改权限), chown, date, mv, mkdir, cp, bash等常用的指令。 |
+  | /boot | 系统内核。主要放置开机会使用到的档案，包括Linux核心档案以及开机选单与开机所需设定档等 等。Linux kernel常用的档名为:vmlinuz ，如果使⽤用的是grub这个开机管理理程式，则 还会存在/boot/grub/这个目录。 |
+  | /dev  | 设备，硬件。在Linux系统上，任何装置与周边设备都是以档案的型态存在于这个目录当中。 只要通 过存取这个目录下的某个档案，就等于存取某个装置。⽐比要重要的档案有/dev/null, /dev/zero, /dev/tty , /dev/lp*, / dev/hd*, /dev/sd*等等 |
+  | /etc  | 配置文件。系统主要的设定档几乎都放置在这个⽬录内，例如人员的帐号密码档、各种服务的启始档等。 ⼀一般来说，这个⽬录下的各档案属性是可以让一般使用者查阅的，但是只有root有权⼒修改。 FHS建议不不要放置可执行档(binary)在这个⽬录中。 比较重要的档案有:/etc/inittab, /etc/init.d/, /etc/modprobe.conf, /etc/X11/, /etc/fstab, /etc/sysconfig/等等。 另外，其下重要的⽬录有:/etc/init.d/ :所有服务的预设启动 script都是放在这里的，例如要启动或者关闭iptables的话: /etc/init.d/iptables start、/etc/init.d/ iptables stop/etc/xinetd.d/ :这就是所谓的super daemon管理理的 各项服务的设定档目录。/etc/X11/ :与X Window有关的各种设定档都在这里，尤其 是xorg.conf或XF86Config这两个X Server的设定档。 |
+  | /home | 用户：两类用户，root（专用目录root）/普通用户（每个目录对应一个普通用户），cd+会车返回当前用户的home目录，su+用户名切换用户。这是系统预设的使⽤者家目录(home directory)。 在你新增一个一般使⽤用者帐号时， 预设的使⽤者家⽬录都会规范到这里来。⽐较重要的是，家⽬录有两种代号: ~ :代 表当前使⽤者的家⽬录，而 ~guest:则代表用户名为guest的家目录。 |
+  | /lib  | 公用函数库。系统的函式库⾮常的多，而/lib放置的则是在开机时会用到的函式库，以及在/bin 或/sbin底下的指令会呼叫的函式库而已 。 什么是函式库呢?妳可以将他想成是外挂， 某些指令必须要有这些外挂才能够顺利完成程式的执⾏行行之意。 尤其重要的 是/lib/modules/这个⽬录，因为该目录会放置核心相关的模组(驱动程式)。 |
+
+  |        |                                                              |
+  | ------ | ------------------------------------------------------------ |
+  | /media | u盘等。media是媒体的英⽂，顾名思义，这个/media底下放置的就是可移除的装置。 包括软碟、光碟、DVD等等装置都暂时挂载于此。 常见的档名有:/media/floppy, /media/cdrom等等。 |
+  | /mnt   | 如果妳想要暂时挂载某些额外的装置，⼀一般建议妳可以放置到这个⽬录中。在古早时候，这个⽬录的⽤用途与/media相同啦。 只是有了/media之后，这个目录就用来暂时挂载⽤了。 |
+  | /opt   | 程序。这个是给第三方协力软体放置的⽬目录 。 什什么是第三⽅方协力软体啊?举例来说，KDE这 个桌面管理系统是⼀一个独⽴的计画，不不过他可以安装到Linux系统中，因此KDE的软体就建议放置到此⽬录下了了。 另外，如果妳想要自⾏安装额外的软体(⾮非原本的 distribution提供的)，那么也能够将你的软体安装到这⾥来。 不不过，以前的Linux系统 中，我们还是习惯放置在/usr/local⽬目录下。 |
+  | /root  | 系统管理员(root)的家目录。 之所以放在这里，是因为如果进入单⼈维护模式⽽而仅挂载根⽬录时，该⽬目录就能够拥有root的家目录，所以我们会希望root的家⽬录与根⽬录放 置在同⼀个分区中。 |
+  | /sbin  | 命令，->代表快捷方式，也叫链接，软链接，ls -l。Linux有⾮常多指令是⽤用来设定系统环境的，这些指令只有root才能够利利⽤用来设定系 统，其他使⽤者最多只能⽤来查询⽽已。放在/sbin底下的为开机过程中所需要的，里面包括了开机、修复、还原系统所需要的指令。⾄于某些伺服器软体程式，⼀一般则放 置到/usr/sbin/当中。⾄于本机⾃⾏安装的软体所产⽣的系统执行档(system binary)， 则放置到/usr/local/sbin/当中了。常⻅的指令包括:fdisk, fsck, ifconfig, init, mkfs等 等。 |
+  | /srv   | srv可以视为service的缩写，是⼀些⽹路服务启动之后，这些服务所需要取⽤的资料⽬ 录。 常⻅的服务例如WWW, FTP等等。 举例来说，WWW伺服器器需要的⽹页资料就可 以放置在/srv/www/⾥⾯。呵呵，看来平时我们编写的代码应该放到这里了。 |
+  | /tmp   | 这是让⼀般使用者或者是正在执行的程序暂时放置档案的地⽅方。这个⽬录是任何⼈都能够存取的，所以你需要定期的清理⼀下。当然，重要资料不可放置在此⽬录啊。 因为FHS甚⾄建议在开机时，应该要将/tmp下的资料都删除。 |
+
 - **文件权限**
 
 - **硬件/性能**
@@ -493,6 +512,7 @@ ssh链接远程系统
 测试硬件性能
 
 ```
+ip addr # 查看ip
 ssh -p 27822 name@xxx.xxx.cn
 lsb_release -a # 查看版本，未找到lsb_release时，安装lsb：yum install redhat-lsb -y，切换root：su
 uname -a # 查看内核版本
@@ -798,7 +818,7 @@ sudo docker run hello-world
 
 ```cmd
 {
-	"registry-mirrors": ["https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://docker.mirrors.ustc.edu.cn","https://cr.console.aliyun.com/"]
+	"registry-mirrors": ["https://registry.docker-cn.com","http://hub-mirror.c.163.com","https://docker.mirrors.ustc.edu.cn","https://docker.mirrors.ustc.edu.cn","https://cr.console.aliyun.com/"	]
 }
 # Docker中国区官方镜像:
 # https://registry.docker-cn.com
@@ -2385,12 +2405,12 @@ docker安装：dockerhub，https://hub.docker.com/_/mongo
 # docker-compose.yml
 version: '3.1'
 services:
-  mongo:
+  mongo_community:
     image: mongo
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_PASSWORD: mongopass
     ports:
       - 27017:27017
     # 持久化
@@ -2403,6 +2423,97 @@ docker-compose up -d
 firewall-cmd --add-port=27017/tcp --permanent
 firewall-cmd --reload
 ```
+
+#### 初始化配置
+
+```cmd
+# mongodb 的容器名称 mongo 进入 mongoDB 的 shell 工具
+$ docker exec -it mongotest_mongo_1 mongo
+
+# 然后进入管理员
+> use admin
+switched to db admin
+
+# 输入配置中的账户密码
+> db.auth('root', 'example')
+1
+
+# 查看数据库
+> show dbs
+admin   0.000GB
+config  0.000GB
+local   0.000GB
+
+# 创建一个新的数据库
+> use testdb
+switched to db testdb
+
+# 创建一个新用户
+# 用户名是 test，密码是 123456，角色是数据库拥有者，拥有的数据库是testdb
+> db.createUser({user:'test',pwd:'123456',roles:[{role:'dbOwner', db:'testdb'}]})
+Successfully added user: {
+    "user" : "test",
+    "roles" : [
+        {
+            "role" : "dbOwner",
+            "db" : "testdb"
+        }
+    ]
+}
+```
+
+角色相关官方说明 https://docs.mongodb.com/manual/reference/built-in-roles/index.html
+
+
+
+然后我们重新登录一次
+
+```cmd
+$ docker exec -it mongomacos_mongo_1 mongo
+
+> use testdb
+switched to db testdb
+
+> db.auth('test', '123456')
+1
+
+# 插入数据
+> db.users.insertOne({name:'zws',age:'25',email:'zws@qq.com'})
+{
+    "acknowledged" : true,
+  # 默认的ID值
+    "insertedId" : ObjectId("603b3932b3ec63337b0050b4")
+}
+
+# 这里自动创建了名为users的集合，这个 collections 类似于MySQL的表
+> show collections
+users
+
+# 查询数据
+db.users.find({})
+{ "_id" : ObjectId("5fafbfcfe8b2cc357c14a8de"), "name" : "zwx", "age" : "25", "email" : "work@zwx.ink" }
+
+# 再插入一条模式不一样的数据
+db.users.insertOne({name:'typ', age:26})
+{
+    "acknowledged" : true,
+    "insertedId" : ObjectId("5fafc132e8b2cc357c14a8df")
+}
+
+# 再次查询数据
+{ "_id" : ObjectId("5fafbfcfe8b2cc357c14a8de"), "name" : "zwx", "age" : "25", "email" : "work@zwx.ink" }
+{ "_id" : ObjectId("5fafc132e8b2cc357c14a8df"), "name" : "typ", "age" : 26 }
+
+# 更新数据 (查询条件,要更新的键值)
+> db.users.updateOne({name:'typ'},{$set:{email:'test@test.com'}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+# 查询看是否更新成功
+db.users.find({name:'typ'})
+{ "_id" : ObjectId("5fafc132e8b2cc357c14a8df"), "name" : "typ", "age" : 26, "email" : "test@test.com" }
+```
+
+增删改查官方文档说明 https://docs.mongodb.com/manual/crud/
 
 #### Robo 3t
 
@@ -2509,7 +2620,7 @@ docker，dockerhub`docker-compose up -d`使用docker-compose安装
 # docker run安装
 # docker run -itd --restart=always -p 15001:6379 -v /home/redistest:/data redis
 
-# community/redis/docker-compose.yml
+# /etc/community/redis/docker-compose.yml
 version: '3.1'
 services:
 	redis-community:
@@ -2525,6 +2636,13 @@ services:
 ```
 
 默认配置https://github.com/redis/redis/blob/unstable/redis.conf，默认6379port
+
+```cmd
+# 900秒，一个键值变化就会存储
+save 900 1
+save 300 10
+save 60 10000
+```
 
 #### redis cli
 
@@ -2697,7 +2815,7 @@ json web token，一个jwt由三部分组成：header加密方式及token类型�
 
 特点：防止csrf（防止伪造请求），适合移动端，无状态，
 
-jwt.io
+工具：jwt.io
 
 客户端请求服务端login，验证后返回token，再请求时带上token，服务器验证token返回数据
 
@@ -2713,5 +2831,95 @@ jwt.io
 
 ### node集成
 
-koa-jwt
+鉴权库：koa-jwt库https://www.npmjs.com/package/koa-jwt
+
+common/errHandle错误处理：401，500
+
+```js
+export default (ctx, next) => {
+    return next().catch((err) => {
+        if (401 == err.status) {
+          ctx = {
+              code: '401',
+              msg: 'Protected resource, use Authorization header to get access\n'
+          };
+        } else {
+          // throw err;
+          ctx.status = err.status || 500
+          ctx.body = Object.assign({
+            code: 500,
+            msg: err.message
+          }, process.env.NODE_ENV === 'development' ? { stack: err.stack } : {})
+        }
+      });
+}
+```
+
+产生校验token：jsonwebtoken库
+
+请求头：Authorization: Bearer token
+
+> npm-run-all：运行多个脚本
+>
+> 提供了三个命令
+>
+> npm-run-all：参数 -s，-p
+>
+> run-s：串行
+>
+> run-p：并行
+
+vscode调试配置
+
+```json
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch via NPM",
+      "runtimeExecutable": "npm",
+      "restart": true,
+      "console": "integratedTerminal",
+      "runtimeArgs": ["run-script", "start:dist"],
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "nodemon",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
+      "program": "${workspaceFolder}/src/index.js",
+      "restart": true,
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["--exec", "babel-node"]
+    }
+  ]
+}
+```
+
+> Lsof -i:3000 // 查看端口占用
+
+VSCode支持alias：插件node module resolve，创建jsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "allowSyntheticDefaultImports": false,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+Chrome 调试：使用Debugger
 
