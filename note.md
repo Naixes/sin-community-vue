@@ -2923,3 +2923,6 @@ VSCode支持alias：插件node module resolve，创建jsconfig.json
 
 Chrome 调试：使用Debugger
 
+> 密码加密库：bcrypt
+>
+> 前端数据接口管理工具：doclever

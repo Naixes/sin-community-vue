@@ -22,16 +22,16 @@
                 <form method="post">
                   <ValidationProvider
                     tag="div"
-                    rules="required"
+                    rules="required|email"
                     v-slot="{ errors }"
                     class="layui-form-item"
                   >
-                    <label for="L_username" class="layui-form-label">昵称</label>
+                    <label for="L_email" class="layui-form-label">用户名</label>
                     <div class="layui-input-inline">
                       <input
                         type="text"
-                        name="username"
-                        v-model.trim="username"
+                        name="email"
+                        v-model.trim="email"
                         placeholder="请输入"
                         autocomplete="off"
                         class="layui-input"
@@ -41,7 +41,7 @@
                   </ValidationProvider>
                   <ValidationProvider
                     tag="div"
-                    rules="required|min:4"
+                    rules="required|min:6|max:16|"
                     v-slot="{ errors }"
                     class="layui-form-item"
                   >
@@ -129,14 +129,11 @@ export default {
       svg: '',
       email: '',
       password: '',
-      captcha: '',
-      username: ''
+      captcha: ''
     }
   },
 
   components: { ValidationProvider, ValidationObserver },
-
-  computed: {},
 
   mounted () {
     let sid = ''
@@ -157,14 +154,14 @@ export default {
         return
       }
       const params = {
-        username: this.username,
+        email: this.email,
         password: this.password,
         sid: this.$store.state.sid,
         captcha: this.captcha
       }
       login(params).then(res => {
         if (res.code === 200) {
-          this.username = ''
+          this.email = ''
           this.password = ''
           this.captcha = ''
           requestAnimationFrame(() => {
@@ -192,5 +189,8 @@ export default {
 <style lang="scss" scoped>
 .svg {
   position: relative;
+}
+.error {
+  color: #c00;
 }
 </style>
