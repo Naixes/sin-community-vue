@@ -5,9 +5,12 @@ import axios from 'axios'
 
 import errorHandle from './errorHandle'
 
+const CancelToken = axios.CancelToken
 class HttpRequest {
   constructor (baseURL) {
     this.baseURL = baseURL
+    // 正在进行的请求
+    this.pending = {}
   }
 
   getInsideOptions () {
@@ -23,16 +26,34 @@ class HttpRequest {
     return options
   }
 
+  removePending (key, isRequest = false) {
+    if (this.pending[key] && isRequest) {
+      this.pending[key]('取消重复请求')
+    }
+    delete this.pending[key]
+  }
+
   interceptors (instance) {
     instance.interceptors.request.use(function (config) {
       console.log(config)
+      // 避免重复请求
+      const key = config.method + '&' + config.url
+      // 取消重复请求，删除请求pending
+      this.removePending(key, true)
+      // 添加到pending
+      config.cancelToken = new CancelToken(c => {
+        this.pending[key] = c
+      })
       return config
     }, error => {
+      errorHandle(error)
       return Promise.reject(error)
     })
 
     instance.interceptors.response.use(res => {
-      console.log('res' + res)
+      const key = res.method + '&' + res.url
+      // 删除请求pending，防止内存溢出，防止拦截正常请求
+      this.removePending(key)
       if (res.status === 200) {
         return Promise.resolve(res.data)
       } else {
