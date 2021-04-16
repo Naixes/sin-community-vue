@@ -34,7 +34,7 @@ class HttpRequest {
   }
 
   interceptors (instance) {
-    instance.interceptors.request.use(function (config) {
+    instance.interceptors.request.use(config => {
       console.log(config)
       // 避免重复请求
       const key = config.method + '&' + config.url

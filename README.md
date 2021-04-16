@@ -4,19 +4,17 @@ Vue2+koa2
 
 ## 环境
 
+使用 layui 框架完成样式布局
 
+使用 mongoDB 作为数据库
 
-使用layui框架完成样式布局
+使用 moment 处理时间
 
-使用mongoDB作为数据库
+使用 showdoc 本地化部署接口文档管理
 
-使用moment处理时间
+使用本地化部署的 gitlab 作为版本管理
 
-使用showdoc本地化部署接口文档管理
-
-使用本地化部署的gitlab作为版本管理
-
-使用本地化部署的jenkins+dockerfile作为ci/cd工具，对接gitlab
+使用本地化部署的 jenkins+dockerfile 作为 ci/cd 工具，对接 gitlab
 
 ## 登录注册模块
 
@@ -24,23 +22,23 @@ Vue2+koa2
 - 拦截非正常登录请求
 - 登录验证（token），统计信息
 
-使用svg-captcha完成图形验证码
+使用 svg-captcha 完成图形验证码
 
-使用vuelidate或veevalidate3（较简单，4版本支持vue3）数据校验
+使用 vuelidate 或 veevalidate3（较简单，4 版本支持 vue3）数据校验
 
-使用nodemailer完成邮件发送，qq邮箱获取授权码，qq等公共邮箱一般有一些限制，可以使用付费的邮件服务
+使用 nodemailer 完成邮件发送，qq 邮箱获取授权码，qq 等公共邮箱一般有一些限制，可以使用付费的邮件服务
 
-使用bcrypt加密敏感数据
+使用 bcrypt 加密敏感数据
 
-使用jwt方式鉴权：
+使用 jwt 方式鉴权：
 
-- 前端生成唯一标识符（uuid），后端通过redis将标识符和验证码对应起来（存储），通过标识符进行鉴权
+- 前端生成唯一标识符（uuid），后端通过 redis 将标识符和验证码对应起来（存储），通过标识符进行鉴权
 
-- 鉴权库：koa-jwt库https://www.npmjs.com/package/koa-jwt
+- 鉴权库：koa-jwt 库https://www.npmjs.com/package/koa-jwt
 
-- common/errHandle错误处理
+- common/errHandle 错误处理
 
-- 产生校验token：jsonwebtoken库
+- 产生校验 token：jsonwebtoken 库
 
   请求头：Authorization: Bearer token
 
@@ -55,9 +53,9 @@ Vue2+koa2
 > run-p：并行
 
 - 验证验证码和用户名密码
-- 前端校验，使用vue插件系统和自定义组件完成错误提示
+- 前端校验，使用 vue 插件系统和自定义组件完成错误提示
 
-> 调试小技巧：mounted中window.vue = this，就可以在浏览器查看或操作
+> 调试小技巧：mounted 中 window.vue = this，就可以在浏览器查看或操作
 
 - 注册用户
 
@@ -101,16 +99,139 @@ Vue2+koa2
 
 ### 组件拆分
 
-页面header，footer通用结构
+页面 header，footer 通用结构
 
-侧边栏按功能拆分links，sign...
+侧边栏按功能拆分 links，sign...
 
-列表list，listItem，top
+列表 list，listItem，top
 
 - 路由，高亮
 - 长列表，loading
 - 拦截器，取消请求（cancelToken）
-- 避免tab点击重复执行
+- 避免 tab 点击重复执行
 
+### 后端
 
+#### eslint
 
+安装 eslint，`npx eslint --init //初始化eslint npx eslint src/**/*.js //校验指定文件`
+
+安装 eslint-config-standard，`npm install --save-dev eslint-config-standard eslint-plugin-promise eslint-plugin-import eslint-plugin-node`
+
+Then, add this to your `.eslintrc` file:
+
+```
+{
+  "extends": "standard"
+}
+```
+
+> npm-check-updates：依赖包升级
+
+#### 接口
+
+查询 List，联合查询
+
+```js
+// models/Post
+import moment from 'dayjs';
+import mongoose from '../config/DBHelper';
+
+const Schema = mongoose.Schema;
+
+const PostSchema = new Schema({
+  // 链接到用户
+  uid: { type: String, ref: 'users' },
+  title: { type: String },
+  content: { type: String },
+  created: { type: Date },
+  catalog: { type: String },
+  points: { type: Number },
+  isEnd: { type: String },
+  reads: { type: Number },
+  answers: { type: Number },
+  status: { type: String },
+  isTop: { type: String },
+  sort: { type: String },
+  tags: { type: Array },
+});
+
+// 钩子
+PostSchema.pre('save', function(next) {
+  this.created = moment().format('YYYY-MM-DD HH:mm:ss');
+  next();
+});
+
+PostSchema.statics = {
+  /**
+   * 获取文章列表
+   * @param {Object} options 筛选条件
+   * @param {String} sort 排序
+   * @param {Number} page 分页页数
+   * @param {Number} limit 分页条数
+   */
+  getList: function(options, sort, page, limit) {
+    return (
+      this.find(options)
+        .sort({ [sort]: -1 })
+        .skip(page * limit)
+        .limit(limit)
+        // 联合查询
+        .populate({
+          path: 'uid',
+          select: 'email',
+        })
+    );
+  },
+};
+
+const PostModel = mongoose.model('post', PostSchema);
+
+export default PostModel;
+
+// api/ContentController
+import Post from '../models/Post';
+
+class ContentController {
+  async getPostList(ctx) {
+    const { query } = ctx.request;
+    console.log('query', query);
+    const options = {};
+
+    const sort = query.sort ? query.sort : 'created';
+    const page = query.page ? parseInt(query.page) : 0;
+    const limit = query.limit ? parseInt(query.limit) : 20;
+
+    if (typeof query.catalog !== 'undefined' && query.catalog !== '') {
+      options.catalog = query.catalog;
+    }
+    if (typeof query.isTop !== 'undefined') {
+      options.isTop = query.isTop;
+    }
+    if (typeof query.isEnd !== 'undefined') {
+      options.isEnd = query.isEnd;
+    }
+    if (typeof query.tag !== 'undefined') {
+      options.tags = {
+        $elemMatch: { name: query.tag },
+      };
+    }
+
+    console.log('options', options);
+
+    const result = await Post.getList(options, sort, page, limit);
+
+    ctx.body = {
+      code: 200,
+      data: result,
+      msg: '获取文章列表成功',
+    };
+  }
+}
+
+export default new ContentController();
+```
+
+#### dayjs
+
+移动端推荐 dayjs 代替 monentjs（体积过大）
