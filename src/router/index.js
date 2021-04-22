@@ -2,6 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import store from '@/store'
+import jwt from 'jsonwebtoken'
+import moment from 'moment'
 
 const Login = () => import(/* webpackChunkName: 'Login' */ '../views/Login.vue')
 const Reg = () => import(/* webpackChunkName: 'Reg' */ '../views/Reg.vue')
@@ -64,7 +66,6 @@ const routes = [
   },
   {
     path: '/center',
-    name: 'Center',
     component: Center,
     meta: {
       requireAuth: true
@@ -72,7 +73,7 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'UserCenter',
+        name: 'Center',
         component: UserCenter
       },
       {
@@ -144,9 +145,15 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const userInfo = localStorage.getItem('userInfo')
   if (token !== '' && token !== null) {
-    store.commit('setToken', token)
-    store.commit('setUserInfo', userInfo)
-    store.commit('setIsLogin', true)
+    const payload = jwt.decode(token)
+    // 判断token是否过期
+    if (moment().isBefore(moment(payload.exp * 1000))) {
+      store.commit('setToken', token)
+      store.commit('setUserInfo', userInfo)
+      store.commit('setIsLogin', true)
+    } else {
+      localStorage.clear()
+    }
   }
 
   // 判断是否需要登录判断

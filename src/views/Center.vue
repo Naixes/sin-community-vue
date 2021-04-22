@@ -21,7 +21,7 @@ export default {
         {
           name: '我的主页',
           icon: 'home',
-          path: 'UserCenter'
+          path: 'Center'
         },
         {
           name: '用户中心',
