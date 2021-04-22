@@ -11,22 +11,22 @@ const getList = (options) => {
 
 // 温馨提醒
 const getTips = () => {
-  return axios.get('/public/tips')
+  return axios.get('/public/getTips')
 }
 
 // 本周热议
-const getTop = () => {
-  return axios.get('/public/topWeek')
+const getTopWeek = () => {
+  return axios.get('/public/getTopWeek')
 }
 
 // 友情链接
 const getLinks = () => {
-  return axios.get('/public/links')
+  return axios.get('/public/getLinks')
 }
 
 export {
   getList,
   getTips,
-  getTop,
+  getTopWeek,
   getLinks
 }
