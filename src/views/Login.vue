@@ -41,7 +41,7 @@
                   </ValidationProvider>
                   <ValidationProvider
                     tag="div"
-                    rules="required|min:6|max:16|"
+                    rules="required|min:4|max:16|"
                     v-slot="{ errors }"
                     class="layui-form-item"
                   >
@@ -136,15 +136,7 @@ export default {
   components: { ValidationProvider, ValidationObserver },
 
   mounted () {
-    let sid = ''
-    if (localStorage.getItem('sid')) {
-      sid = localStorage.getItem('sid')
-    } else {
-      sid = uuidv4()
-      localStorage.setItem('sid', sid)
-    }
-    this.$store.commit('setSid', sid)
-    this._getCaptcha(sid)
+    this._getCaptcha()
   },
 
   methods: {
@@ -161,12 +153,19 @@ export default {
       }
       login(params).then(res => {
         if (res.code === 200) {
+          // 保存用户信息，和登录状态
+          this.$store.commit('setToken', res.token)
+          this.$store.commit('setUserInfo', res.data)
+          this.$store.commit('setIsLogin', true)
+
           this.email = ''
           this.password = ''
           this.captcha = ''
           requestAnimationFrame(() => {
             this.$refs.observer.reset()
           })
+          // 跳转
+          this.$router.push({ name: 'Index' })
         } else if (res.code === 401) {
           // 用户名或密码错误
           this.$alert(res.msg)
@@ -176,7 +175,15 @@ export default {
         }
       })
     },
-    _getCaptcha (sid) {
+    _getCaptcha () {
+      let sid = ''
+      if (localStorage.getItem('sid')) {
+        sid = localStorage.getItem('sid')
+      } else {
+        sid = uuidv4()
+        localStorage.setItem('sid', sid)
+      }
+      this.$store.commit('setSid', sid)
       getCaptcha(sid).then((res) => {
         if (res.code === 200) {
           this.svg = res.data

@@ -30,10 +30,10 @@
           <span class="layui-badge fly-badge-accept layui-hide-xs" v-show="item.status !== '0'">已结</span>
           <span class="fly-list-nums">
             <i class="iconfont icon-pinglun1" title="回答"></i>
-            {{item.answer}}
+            {{item.answers}}
           </span>
         </div>
-        <div class="fly-list-badge" v-show="item.tags.length > 0 && item.tags[name]">
+        <div class="fly-list-badge" v-show="item.tags.length > 0 && item.tags[0]['name']">
           <span
             class="layui-badge"
             v-for="(tag, index) in item.tags"

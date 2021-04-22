@@ -236,3 +236,112 @@ export default new ContentController();
 
 移动端推荐 dayjs 代替 monentjs（体积过大）
 
+## 用户中心
+
+sass循环快速生成样式
+
+```scss
+@for $i from 0 to 5 {
+  .pd#{$i} {
+    padding: $i * 10 + px !important;
+  }
+  .pt#{$i} {
+    padding-top: $i * 10 + px !important;
+  }
+  .pl#{$i} {
+    padding-left: $i * 10 + px !important;
+  }
+  .pr#{$i} {
+    padding-right: $i * 10 + px !important;
+  }
+  .pb#{$i} {
+    padding-bottom: $i * 10 + px !important;
+  }
+  .mr#{$i} {
+    margin-right: $i * 10 + px !important;
+  }
+  .mt#{$i} {
+    margin-top: $i * 10 + px !important;
+  }
+  .ml#{$i} {
+    margin-left: $i * 10 + px !important;
+  }
+}
+```
+
+@mixin
+
+```scss
+@mixin reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@mixin horizontal-list {
+  @include reset-list;
+
+  li {
+    display: inline-block;
+    margin: {
+      left: -2px;
+      right: 2em;
+    }
+  }
+}
+
+nav ul {
+  @include horizontal-list;
+}
+```
+
+vscode插件：live sass compiler，实时查看编译结果
+
+dart-sass：调试sass，sass包也可以执行调试语句，dart-sass快一些
+
+```scss
+@warn $test;
+@debug 'xx#{$test}'
+```
+
+each&map-get&maps，应用：生成响应式样式或通用样式库
+
+```scss
+$icons: ("eye": "\f112", "start": "\f12e", "stop": "\f12f");
+
+@each $name, $glyph in $icons {
+  .icon-#{$name}:before {
+    display: inline-block;
+    font-family: "Icon Font";
+    content: $glyph;
+  }
+}
+
+
+@use "sass:map";
+
+$font-weights: ("regular": 400, "medium": 500, "bold": 700);
+
+@debug map.set($font-weights, "extra-bold", 900);
+// ("regular": 400, "medium": 500, "bold": 700, "extra-bold": 900)
+@debug map.set($font-weights, "bold", 900);
+// ("regular": 400, "medium": 500, "bold": 900)
+
+$light-weights: ("lightest": 100, "light": 300);
+$heavy-weights: ("medium": 500, "bold": 700);
+
+@debug map.merge($light-weights, $heavy-weights);
+// ("lightest": 100, "light": 300, "medium": 500, "bold": 700)
+```
+
+全局路由守卫进行判断登录状态
+
+store保存在内存中刷新会被初始化
+
+localStorage和sessionStorage，local会一直存在在缓存文件中，在浏览器中只有当前域可以获取，session会话期间存在
+
+localStorage缓存登录信息
+
+安全性：https
+
+登录机制优化：jwt过期处理

@@ -25,16 +25,17 @@ export default {
         {
           uid: {
             name: 'imooc',
-            isVip: 1
+            isVip: 1,
+            avatar: '/img/header.jpeg'
           },
-          title: '大前端课程',
+          title: '置顶标题111',
           content: '',
           created: '2019-10-01 01:00:00',
           catalog: 'ask',
           points: 40,
           isEnd: 0,
           reads: 10,
-          answer: 0,
+          answers: 0,
           status: 0,
           isTop: 1,
           tags: [

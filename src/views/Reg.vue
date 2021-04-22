@@ -66,7 +66,7 @@
                   <ValidationProvider
                     tag="div"
                     name="password"
-                    rules="required|min:6|max:16|confirmed:confirmation"
+                    rules="required|min:4|max:16|confirmed:confirmation"
                     v-slot="{ errors }"
                     class="layui-form-item"
                   >
@@ -82,7 +82,7 @@
                         class="layui-input"
                       />
                     </div>
-                    <div class="layui-form-mid layui-word-aux">6-16个字符</div>
+                    <div class="layui-form-mid layui-word-aux">4-16个字符</div>
                     <div class="error layui-row">{{ errors[0] }}</div>
                   </ValidationProvider>
                   <ValidationProvider
