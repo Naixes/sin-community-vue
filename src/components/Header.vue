@@ -102,12 +102,13 @@ export default {
 
   methods: {
     logout () {
-      this.$confirm('确定推出登录吗？', () => {
+      this.$confirm('确定退出登录吗？', () => {
         localStorage.clear()
         this.store.commit('setToken', '')
         this.store.commit('setUserInfo', {})
         this.store.commit('setIsLogin', false)
-        this.$router.push('/')
+        // 防止重复导航的报错
+        this.$router.push('/', () => {})
       }, () => {})
     },
     show () {

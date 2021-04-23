@@ -71,13 +71,7 @@ Vue2+koa2
 
 ### 数据库设计
 
-<img src="README.assets/截屏2021-04-15 上午10.37.58.png" alt="截屏2021-04-15 上午10.37.58" style="zoom:50%;" />
-
-<img src="README.assets/截屏2021-04-15 上午11.03.08.png" alt="截屏2021-04-15 上午11.03.08" style="zoom:50%;" />
-
-<img src="README.assets/截屏2021-04-15 上午10.39.06.png" alt="截屏2021-04-15 上午10.39.06" style="zoom:50%;" />
-
-<img src="README.assets/截屏2021-04-15 上午10.39.22.png" alt="截屏2021-04-15 上午10.39.22" style="zoom:50%;" />
+签到记录
 
 ### 接口设计
 
@@ -238,6 +232,8 @@ export default new ContentController();
 
 ## 用户中心
 
+### 前端
+
 sass循环快速生成样式
 
 ```scss
@@ -334,7 +330,7 @@ $heavy-weights: ("medium": 500, "bold": 700);
 // ("lightest": 100, "light": 300, "medium": 500, "bold": 700)
 ```
 
-全局路由守卫进行判断登录状态
+全局路由守卫进行判断登录状态，校验登录信息是否过期
 
 store保存在内存中刷新会被初始化
 
@@ -345,3 +341,11 @@ localStorage缓存登录信息
 安全性：https
 
 登录机制优化：jwt过期处理
+
+签到机制，组件化，签到状态
+
+### 后端
+
+签到逻辑
+
+测试：冒烟测试（针对性），功能测试，临届测试

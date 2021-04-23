@@ -24,20 +24,16 @@ const login = async (params) => {
  * 注册接口
  * @params {} params
  */
-const reg = async (params) => {
-  return axios.post('/login/reg', {
-    ...params
-  })
-}
+const reg = async (params) => axios.post('/login/reg', {
+  ...params
+})
 
 /**
  * 找回密码接口
  * @params {} params
  */
-const forget = async (params) => {
-  return axios.post('/forget', {
-    ...params
-  })
-}
+const forget = async (params) => axios.post('/forget', {
+  ...params
+})
 
 export { getCaptcha, login, reg, forget }

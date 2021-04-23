@@ -7,10 +7,12 @@ import store from './store'
 import { ValidationProvider } from 'vee-validate'
 import './utils/veevalidate'
 import Popup from './components/modules/Popup'
+import Pop from './components/modules/Pop'
 
 Vue.component('ValidationProvider', ValidationProvider)
 
 Vue.use(Popup)
+Vue.use(Pop)
 
 Vue.config.productionTip = false
 
