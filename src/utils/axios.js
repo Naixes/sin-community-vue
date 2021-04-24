@@ -4,6 +4,8 @@
 import axios from 'axios'
 
 import errorHandle from './errorHandle'
+import store from '@/store'
+import _config from '@/config'
 
 const CancelToken = axios.CancelToken
 class HttpRequest {
@@ -34,8 +36,17 @@ class HttpRequest {
   }
 
   interceptors (instance) {
+    // 请求拦截
     instance.interceptors.request.use(config => {
-      console.log(config)
+      let isPublic = false
+      _config.publicPath.map(path => {
+        isPublic = isPublic || path.test(config.url)
+      })
+      const token = store.state.token
+      if (token && !isPublic) {
+        config.headers.Authorization = 'Bear' + store.state.token
+      }
+
       // 避免重复请求
       const key = config.method + '&' + config.url
       // 取消重复请求，删除请求pending
@@ -50,6 +61,7 @@ class HttpRequest {
       return Promise.reject(error)
     })
 
+    // 响应拦截
     instance.interceptors.response.use(res => {
       const key = res.method + '&' + res.url
       // 删除请求pending，防止内存溢出，防止拦截正常请求

@@ -154,6 +154,7 @@ export default {
       login(params).then(res => {
         if (res.code === 200) {
           // 保存用户信息，和登录状态
+          res.data.email = this.email
           this.$store.commit('setToken', res.token)
           this.$store.commit('setUserInfo', res.data)
           this.$store.commit('setIsLogin', true)

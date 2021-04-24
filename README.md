@@ -344,8 +344,24 @@ localStorage缓存登录信息
 
 签到机制，组件化，签到状态
 
+个人设置
+
 ### 后端
 
-签到逻辑
+签到接口
 
-测试：冒烟测试（针对性），功能测试，临届测试
+测试：冒烟测试（针对性），功能测试，临界测试
+
+requie.context对routes入口优化
+
+> 报错：require.context is not a function
+>
+> npm i -D babel-plugin-transform-require-context
+>
+> .babelrc：
+>
+> "plugins": ["transform-require-context"]
+
+更新个人基本信息接口
+
+更新邮箱时发送确认邮件

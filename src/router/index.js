@@ -23,6 +23,7 @@ const UserPosts = () => import(/* webpackChunkName: 'index' */ '../components/us
 const MyPost = () => import(/* webpackChunkName: 'index' */ '../components/user/common/MyPost.vue')
 const MyCollections = () => import(/* webpackChunkName: 'index' */ '../components/user/common/MyCollections.vue')
 const UserOthers = () => import(/* webpackChunkName: 'index' */ '../components/user/Others.vue')
+const NotFound = () => import(/* webpackChunkName: 'index' */ '../views/404.vue')
 
 Vue.use(VueRouter)
 
@@ -77,7 +78,7 @@ const routes = [
         component: UserCenter
       },
       {
-        path: 'set',
+        path: '/set',
         name: 'Settings',
         component: UserSetings,
         children: [
@@ -87,29 +88,29 @@ const routes = [
             component: MyInfo
           },
           {
-            path: 'avatar',
+            path: '/avatar',
             name: 'AvatarUpload',
             component: AvatarUpload
           },
           {
-            path: 'password',
+            path: '/password',
             name: 'Password',
             component: Password
           },
           {
-            path: 'account',
+            path: '/account',
             name: 'Account',
             component: Account
           }
         ]
       },
       {
-        path: 'massage',
+        path: '/massage',
         name: 'Message',
         component: UserMessage
       },
       {
-        path: 'posts',
+        path: '/posts',
         name: 'Posts',
         component: UserPosts,
         children: [
@@ -119,16 +120,25 @@ const routes = [
             component: MyPost
           },
           {
-            path: 'collections',
+            path: '/collections',
             name: 'MyCollections',
             component: MyCollections
           }
         ]
       },
       {
-        path: 'others',
+        path: '/others',
         name: 'Others',
         component: UserOthers
+      },
+      {
+        path: '/404',
+        name: '404',
+        component: NotFound
+      },
+      {
+        path: '*',
+        redirect: '/404'
       }
     ]
   }

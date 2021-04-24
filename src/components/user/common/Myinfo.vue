@@ -1,11 +1,11 @@
 <template>
   <div class="layui-form layui-form-pane layui-tab-item layui-show">
-    <validation-observer ref="observer" v-slot="{ validate }">
+    <validation-observer ref="observer">
       <div class="layui-form-item">
         <validation-provider name="email" rules="required|email" v-slot="{errors}">
           <label for="L_email" class="layui-form-label">邮箱</label>
           <div class="layui-input-inline">
-            <input type="text" name="email" class="layui-input" v-model="username" />
+            <input type="text" name="email" class="layui-input" v-model="email" />
           </div>
           <!-- <div class="layui-form-mid layui-word-aux">
             如果您在邮箱已激活的情况下，变更了邮箱，需
@@ -13,7 +13,7 @@
               href="activate.html"
               style="font-size: 12px; color: #4f99cf;"
             >重新验证邮箱</a>。
-          </div>-->
+          </div> -->
           <div class="layui-form-mid">
             <span style="color: #c00;">{{errors[0]}}</span>
           </div>
@@ -21,7 +21,7 @@
       </div>
       <div class="layui-form-item">
         <validation-provider name="name" rules="required" v-slot="{errors}">
-          <label for="L_username" class="layui-form-label">昵称</label>
+          <label for="L_email" class="layui-form-label">昵称</label>
           <div class="layui-input-inline">
             <input type="text" name="name" class="layui-input" v-model="name" />
           </div>
@@ -80,7 +80,7 @@ export default {
   },
   data () {
     return {
-      username: '',
+      email: '',
       name: '',
       location: '',
       gender: '',
@@ -88,8 +88,8 @@ export default {
     }
   },
   mounted () {
-    const { username, name, location, gender, regmark } = this.$store.state.userInfo
-    this.username = username || ''
+    const { email, name, location, gender, regmark } = this.$store.state.userInfo
+    this.email = email || ''
     this.name = name || ''
     this.location = location || ''
     this.gender = gender || ''
@@ -103,7 +103,7 @@ export default {
         return
       }
       updateUserInfo({
-        username: this.username,
+        email: this.email,
         name: this.name,
         location: this.location,
         gender: this.gender,
@@ -113,7 +113,7 @@ export default {
           this.$store.commit('setUserInfo', {
             ...this.$store.state.userInfo,
             ...{
-              username: this.username,
+              email: this.email,
               name: this.name,
               location: this.location,
               gender: this.gender,
