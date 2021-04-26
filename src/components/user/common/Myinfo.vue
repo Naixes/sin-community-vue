@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import { updateUserInfo } from '@/api/user'
+import { updateUserBasic } from '@/api/user'
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 export default {
   name: 'myinfo',
@@ -102,7 +102,7 @@ export default {
         // ABORT!!
         return
       }
-      updateUserInfo({
+      updateUserBasic({
         email: this.email,
         name: this.name,
         location: this.location,
@@ -110,6 +110,7 @@ export default {
         regmark: this.regmark
       }).then((res) => {
         if (res.code === 200) {
+          // 更新store
           this.$store.commit('setUserInfo', {
             ...this.$store.state.userInfo,
             ...{

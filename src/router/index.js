@@ -6,24 +6,26 @@ import jwt from 'jsonwebtoken'
 import moment from 'moment'
 
 const Login = () => import(/* webpackChunkName: 'Login' */ '../views/Login.vue')
+const Confirm = () => import(/* webpackChunkName: 'Confirm' */ '../views/Confirm.vue')
+const Reset = () => import(/* webpackChunkName: 'Reset' */ '../views/Reset.vue')
 const Reg = () => import(/* webpackChunkName: 'Reg' */ '../views/Reg.vue')
 const Forget = () => import(/* webpackChunkName: 'Forget' */ '../views/Forget.vue')
-const Index = () => import(/* webpackChunkName: 'index' */ '../views/channels/Index.vue')
+const Index = () => import(/* webpackChunkName: 'Index' */ '../views/channels/Index.vue')
 const Template1 = () => import(/* webpackChunkName: 'template1' */ '../views/channels/Template1.vue')
-const User = () => import(/* webpackChunkName: 'index' */ '../views/User.vue')
-const Center = () => import(/* webpackChunkName: 'index' */ '../views/Center.vue')
-const UserCenter = () => import(/* webpackChunkName: 'index' */ '../components/user/Center.vue')
-const UserSetings = () => import(/* webpackChunkName: 'index' */ '../components/user/Settings.vue')
-const MyInfo = () => import(/* webpackChunkName: 'index' */ '../components/user/common/Myinfo.vue')
-const AvatarUpload = () => import(/* webpackChunkName: 'index' */ '../components/user/common/AvatarUpload.vue')
-const Password = () => import(/* webpackChunkName: 'index' */ '../components/user/common/Password.vue')
-const Account = () => import(/* webpackChunkName: 'index' */ '../components/user/common/Account.vue')
-const UserMessage = () => import(/* webpackChunkName: 'index' */ '../components/user/Msg.vue')
-const UserPosts = () => import(/* webpackChunkName: 'index' */ '../components/user/Posts.vue')
-const MyPost = () => import(/* webpackChunkName: 'index' */ '../components/user/common/MyPost.vue')
-const MyCollections = () => import(/* webpackChunkName: 'index' */ '../components/user/common/MyCollections.vue')
-const UserOthers = () => import(/* webpackChunkName: 'index' */ '../components/user/Others.vue')
-const NotFound = () => import(/* webpackChunkName: 'index' */ '../views/404.vue')
+const User = () => import(/* webpackChunkName: 'User' */ '../views/User.vue')
+const Center = () => import(/* webpackChunkName: 'Center' */ '../views/Center.vue')
+const UserCenter = () => import(/* webpackChunkName: 'UserCenter' */ '../components/user/Center.vue')
+const UserSetings = () => import(/* webpackChunkName: 'UserSetings' */ '../components/user/Settings.vue')
+const MyInfo = () => import(/* webpackChunkName: 'MyInfo' */ '../components/user/common/Myinfo.vue')
+const AvatarUpload = () => import(/* webpackChunkName: 'AvatarUpload' */ '../components/user/common/AvatarUpload.vue')
+const Password = () => import(/* webpackChunkName: 'Password' */ '../components/user/common/Password.vue')
+const Account = () => import(/* webpackChunkName: 'Account' */ '../components/user/common/Account.vue')
+const UserMessage = () => import(/* webpackChunkName: 'UserMessage' */ '../components/user/Msg.vue')
+const UserPosts = () => import(/* webpackChunkName: 'UserPosts' */ '../components/user/Posts.vue')
+const MyPost = () => import(/* webpackChunkName: 'MyPost' */ '../components/user/common/MyPost.vue')
+const MyCollections = () => import(/* webpackChunkName: 'MyCollections' */ '../components/user/common/MyCollections.vue')
+const UserOthers = () => import(/* webpackChunkName: 'UserOthers' */ '../components/user/Others.vue')
+const NotFound = () => import(/* webpackChunkName: 'NotFound' */ '../views/404.vue')
 
 Vue.use(VueRouter)
 
@@ -48,6 +50,17 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  // 邮箱修改确认邮件
+  {
+    path: '/confirm',
+    name: 'Confirm',
+    component: Confirm
+  },
+  {
+    path: '/reset',
+    name: 'Reset',
+    component: Reset
   },
   {
     path: '/reg',

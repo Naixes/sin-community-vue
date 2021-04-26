@@ -61,7 +61,7 @@ export default {
         },
         {
           name: '修改头像',
-          route: 'pic',
+          route: 'avatar',
           icon: 'layui-icon-face-smile'
         },
         {

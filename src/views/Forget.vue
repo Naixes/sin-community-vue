@@ -18,7 +18,7 @@
           <div class="layui-tab-item layui-show">
             <!-- 重置密码 -->
             <!--
-          <div class="fly-msg">{{d.username}}，请重置您的密码</div>
+          <div class="fly-msg">{{d.email}}，请重置您的密码</div>
           <div class="layui-form layui-form-pane"  style="margin-top: 30px;">
             <form action="/user/repass" method="post">
               <div class="layui-form-item">
@@ -44,7 +44,7 @@
                 </div>
               </div>
               <div class="layui-form-item">
-                <input type="hidden" name="username" value="{{d.username}}">
+                <input type="hidden" name="email" value="{{d.email}}">
                 <input type="hidden" name="email" value="{{d.email}}">
                 <button class="layui-btn" alert="1" lay-filter="*" lay-submit>提交</button>
               </div>

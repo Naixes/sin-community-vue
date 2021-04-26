@@ -18,11 +18,11 @@
               <li class="sign-item" v-for="(item,index) in lists" :key="'sign' + index">
                 <img
                   v-if="current===0"
-                  :src="item.pic ? item.pic : '/img/bear-200-200.jpg'"
+                  :src="item.avatar ? item.avatar : '/img/bear-200-200.jpg'"
                   alt
                   class="mr1"
                 />
-                <img v-else :src="item.uid ? item.uid.pic : '/img/bear-200-200.jpg'" class="mr1" />
+                <img v-else :src="item.uid ? item.uid.avatar : '/img/bear-200-200.jpg'" class="mr1" />
                 <cite class="fly-link">{{item.name ? item.name : item.uid.name}}</cite>
                 <span class="fly-grey" v-if="current !== 0">签到于 {{item.created | hours}}</span>
                 <span class="fly-grey" v-else>

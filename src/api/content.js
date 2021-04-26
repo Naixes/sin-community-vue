@@ -16,9 +16,13 @@ const getTopWeek = () => axios.get('/public/getTopWeek')
 // 友情链接
 const getLinks = () => axios.get('/public/getLinks')
 
+// 图片上传
+const uploadImg = (formData) => axios.post('/content/uploadImg', formData)
+
 export {
   getList,
   getTips,
   getTopWeek,
-  getLinks
+  getLinks,
+  uploadImg
 }

@@ -4,17 +4,18 @@
     <div class="layui-form-item">
       <div class="avatar-add">
         <p>建议尺寸168*168，支持jpg、png、gif，最大不能超过50KB</p>
-        <label for="pic" class="layui-btn upload-img">
+        <!-- label绑定input -->
+        <label for="avatar" class="layui-btn upload-img">
           <i class="layui-icon">&#xe67c;</i>上传头像
         </label>
         <input
-          id="pic"
+          id="avatar"
           type="file"
           name="file"
           accept="image/png, image/gif, image/jpg"
           @change="upload"
         />
-        <img :src="pic" />
+        <img :src="avatar" />
         <span class="loading"></span>
       </div>
     </div>
@@ -23,15 +24,15 @@
 
 <script>
 import { uploadImg } from '@/api/content'
-import { updateUserInfo } from '@/api/user'
+import { updateUserBasic } from '@/api/user'
 export default {
-  name: 'pic-upload',
+  name: 'avatar-upload',
   data () {
     return {
-      // 判断 userInfo & pic 是否存在
-      pic:
-        this.$store.state.userInfo && this.$store.state.userInfo.pic
-          ? this.$store.state.userInfo.pic
+      // 判断 userInfo & avatar 是否存在
+      avatar:
+        this.$store.state.userInfo && this.$store.state.userInfo.avatar
+          ? this.$store.state.userInfo.avatar
           : '/img/bear-200-200.jpg',
       formData: ''
     }
@@ -47,18 +48,19 @@ export default {
       // 上传图片的之后 -> uploadImg
       uploadImg(formData).then((res) => {
         if (res.code === 200) {
-          this.pic = res.data
-          // 更新用户基本资料 -> updateUserInfo
-          updateUserInfo({ pic: this.pic }).then((res) => {
+          this.avatar = res.data
+          // 更新用户基本资料 -> updateUserBasic
+          updateUserBasic({ avatar: this.avatar }).then((res) => {
             if (res.code === 200) {
-              // 修改全局的 store 内的用户基础信息
+              // 修改 store 内的用户基础信息
               const user = this.$store.state.userInfo
-              this.$set(this.$store.state.userInfo, 'pic', this.pic)
+              this.$set(this.$store.state.userInfo, 'avatar', this.avatar)
               this.$store.commit('setUserInfo', user)
               this.$alert('图片上传成功')
             }
           })
-          document.getElementById('pic').value = ''
+          // 清空
+          document.getElementById('avatar').value = ''
         }
       })
     }
@@ -67,7 +69,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#pic {
+#avatar {
   display: none;
 }
 </style>
