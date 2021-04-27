@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import { extend, localize } from 'vee-validate'
-import { required, email, min, max, confirmed, length } from 'vee-validate/dist/rules'
+// eslint-disable-next-line
+import { required, email, min, max, confirmed, length, is_not } from 'vee-validate/dist/rules'
 
 extend('required', required)
 extend('email', email)
@@ -8,6 +9,7 @@ extend('min', min)
 extend('max', max)
 extend('length', length)
 extend('confirmed', confirmed)
+extend('is_not', is_not)
 
 // 激活中文
 localize('zh-CN')
@@ -21,11 +23,24 @@ localize({
       min: (name, { length }) => `长度大于${length}`,
       max: (name, { length }) => `长度小于${length}`,
       length: (field, args) => field + '长度要求' + args,
-      confirmed: '密码不匹配'
+      confirmed: '密码不匹配',
+      is_not: (field, args) => '请选择{_field_}'
     },
     names: {
-      email: 'E-mail Address',
-      password: 'Password'
+      email: '邮箱',
+      password: '密码',
+      repassword: '确认密码',
+      oldpassword: '旧密码',
+      name: '昵称',
+      code: '验证码',
+      title: '标题',
+      catalog: '分类'
+    },
+    // 针对不同的name，定义不同的message消息
+    fields: {
+      // catalog: {
+      //   is_not: '请选择{_field_}'
+      // }
     }
   }
 })

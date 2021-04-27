@@ -53,10 +53,13 @@
 </template>
 
 <script>
-import moment from 'moment'
-import 'moment/locale/zh-cn'
-
+import moment from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime' // 按需加载插件
+import 'dayjs/locale/zh-cn'
 import _ from 'lodash'
+
+moment.extend(relativeTime) // 使用插件
+
 export default {
   name: 'listitem',
   props: {
@@ -112,7 +115,7 @@ export default {
         return moment(date).format('YYYY-MM-DD')
       } else {
         // 1小前，xx小时前，X天前
-        return moment(date).from(moment())
+        return moment(date).locale('zh-cn').from(moment())
       }
     }
   }

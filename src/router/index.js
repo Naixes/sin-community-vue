@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import store from '@/store'
 import jwt from 'jsonwebtoken'
-import moment from 'moment'
+import moment from 'dayjs'
 
 const Login = () => import(/* webpackChunkName: 'Login' */ '../views/Login.vue')
 const Confirm = () => import(/* webpackChunkName: 'Confirm' */ '../views/Confirm.vue')
@@ -25,6 +25,7 @@ const UserPosts = () => import(/* webpackChunkName: 'UserPosts' */ '../component
 const MyPost = () => import(/* webpackChunkName: 'MyPost' */ '../components/user/common/MyPost.vue')
 const MyCollections = () => import(/* webpackChunkName: 'MyCollections' */ '../components/user/common/MyCollections.vue')
 const UserOthers = () => import(/* webpackChunkName: 'UserOthers' */ '../components/user/Others.vue')
+const Add = () => import(/* webpackChunkName: 'Add' */ '../components/contents/Add.vue')
 const NotFound = () => import(/* webpackChunkName: 'NotFound' */ '../views/404.vue')
 
 Vue.use(VueRouter)
@@ -71,6 +72,11 @@ const routes = [
     path: '/forget',
     name: 'Forget',
     component: Forget
+  },
+  {
+    path: '/add',
+    name: 'Add',
+    component: Add
   },
   {
     path: '/user/:id',

@@ -230,6 +230,8 @@ export default new ContentController();
 
 移动端推荐 dayjs 代替 monentjs（体积过大）
 
+插件
+
 ## 用户中心
 
 ### 前端
@@ -346,7 +348,9 @@ localStorage缓存登录信息
 
 个人设置
 
-> Vetur：
+发帖，自定义编辑器
+
+mixin封装验证码，属性方法会覆盖，钩子函数都会执行，先调用mixin后组件
 
 ### 后端
 

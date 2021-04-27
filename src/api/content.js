@@ -19,10 +19,14 @@ const getLinks = () => axios.get('/public/getLinks')
 // 图片上传
 const uploadImg = (formData) => axios.post('/content/uploadImg', formData)
 
+// 发帖
+const addPost = params => axios.post('/content/add', params)
+
 export {
   getList,
   getTips,
   getTopWeek,
   getLinks,
-  uploadImg
+  uploadImg,
+  addPost
 }
