@@ -22,11 +22,15 @@ const uploadImg = (formData) => axios.post('/content/uploadImg', formData)
 // 发帖
 const addPost = params => axios.post('/content/add', params)
 
+// 帖子详情
+const getDetail = params => axios.get('/content/detail', params)
+
 export {
   getList,
   getTips,
   getTopWeek,
   getLinks,
   uploadImg,
-  addPost
+  addPost,
+  getDetail
 }

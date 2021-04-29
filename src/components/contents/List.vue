@@ -11,7 +11,7 @@
       <span class="fly-filter-right layui-hide-xs">
         <a :class="{'layui-this': sort === 'created'}" @click.prevent="search(3)">按最新</a>
         <span class="fly-mid"></span>
-        <a :class="{'layui-this': sort === 'answer'}" @click.prevent="search(4)">按热议</a>
+        <a :class="{'layui-this': sort === 'answers'}" @click.prevent="search(4)">按热议</a>
       </span>
     </div>
     <list-item :lists="lists" :isEnd="isEnd" @nextpage="nextPage()"></list-item>
@@ -138,7 +138,7 @@ export default {
           break
         // 按照评论数去查询
         case 4:
-          this.sort = 'answer'
+          this.sort = 'answers'
           break
         // 综合查询
         default:

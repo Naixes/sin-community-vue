@@ -47,7 +47,7 @@
             <td>{{item.status === '0' ? '打开': '关闭'}}</td>
             <td :class="{'success': item.isEnd !=='0'}">{{item.isEnd === '0'? '未结': '已结贴'}}</td>
             <td>{{item.created | moment}}</td>
-            <td>{{item.reads}}阅/{{item.answer}}答</td>
+            <td>{{item.reads}}阅/{{item.answers}}答</td>
             <td>
               <div
                 class="layui-btn layui-btn-xs"

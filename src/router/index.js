@@ -26,6 +26,7 @@ const MyPost = () => import(/* webpackChunkName: 'MyPost' */ '../components/user
 const MyCollections = () => import(/* webpackChunkName: 'MyCollections' */ '../components/user/common/MyCollections.vue')
 const UserOthers = () => import(/* webpackChunkName: 'UserOthers' */ '../components/user/Others.vue')
 const Add = () => import(/* webpackChunkName: 'Add' */ '../components/contents/Add.vue')
+const Detail = () => import(/* webpackChunkName: 'Add' */ '../components/contents/Detail.vue')
 const NotFound = () => import(/* webpackChunkName: 'NotFound' */ '../views/404.vue')
 
 Vue.use(VueRouter)
@@ -77,6 +78,11 @@ const routes = [
     path: '/add',
     name: 'Add',
     component: Add
+  },
+  {
+    path: '/detail',
+    name: 'Detail',
+    component: Detail
   },
   {
     path: '/user/:id',
