@@ -112,7 +112,7 @@
           <div class="layui-btn-container fly-detail-admin pt1">
             <router-link
               class="layui-btn layui-btn-sm jie-admin"
-              :to="{name: 'edit', params: {tid: tid , page: page}}"
+              :to="{name: 'Edit', params: {tid: tid , page: page}}"
               v-show="page.isEnd === '0' && page.uid._id === user._id"
             >编辑</router-link>
             <a

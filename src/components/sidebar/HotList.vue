@@ -3,7 +3,7 @@
     <dl class="fly-panel fly-list-one">
       <dt class="fly-panel-title">本周热议</dt>
       <dd v-for="item in topWeek" :key="item._id">
-        <a href="jie/detail.html">{{item.title}}</a>
+        <router-link :to="{name: 'Detail', params: {tid: item._id}}">{{item.title}}</router-link>
         <span>
           <i class="iconfont icon-pinglun1"></i> {{item.answers}}
         </span>

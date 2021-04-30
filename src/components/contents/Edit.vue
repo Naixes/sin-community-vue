@@ -149,7 +149,7 @@ export default {
     if (this.page) {
       this.content = this.page.content
       this.title = this.page.title
-      this.favIndex = this.favList.indexOf(parseInt(this.page.fav))
+      this.favIndex = this.favList.indexOf(parseInt(this.page.points))
       this.cataIndex = this.catalogs.indexOf(this.catalogs.filter((item) => item.value === this.page.catalog)[0])
       // 缓存edit内容
       localStorage.setItem('editData', JSON.stringify(this.page))

@@ -1,6 +1,8 @@
 import axios from '@/utils/request'
 import qs from 'qs'
 
+import store from '../store'
+
 /**
  * 读取文章列表
  * @param {Object} options 读取文章列表接口参数
@@ -23,7 +25,19 @@ const uploadImg = (formData) => axios.post('/content/uploadImg', formData)
 const addPost = params => axios.post('/content/add', params)
 
 // 帖子详情
-const getDetail = params => axios.get('/content/detail', params)
+const getDetail = tid => {
+  const token = store.state.token
+  let headers = {}
+  if (token) {
+    headers = {
+      Authorization: 'Bear' + token
+    }
+  }
+  axios.get('/content/detail?tid' + tid, headers)
+}
+
+// 编辑帖子
+const updatePost = params => axios.post('/content/update', params)
 
 export {
   getList,
@@ -32,5 +46,6 @@ export {
   getLinks,
   uploadImg,
   addPost,
-  getDetail
+  getDetail,
+  updatePost
 }

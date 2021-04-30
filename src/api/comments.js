@@ -10,9 +10,7 @@ const getComents = (params) => {
       Authorization: 'Bear' + token
     }
   }
-  return axios.get('/public/comments?' + qs.stringify(params), {
-    headers
-  })
+  return axios.get('/public/comments?' + qs.stringify(params), headers)
 }
 
 const addComment = params => axios.post('/comments/reply', params)

@@ -26,7 +26,8 @@ const MyPost = () => import(/* webpackChunkName: 'MyPost' */ '../components/user
 const MyCollections = () => import(/* webpackChunkName: 'MyCollections' */ '../components/user/common/MyCollections.vue')
 const UserOthers = () => import(/* webpackChunkName: 'UserOthers' */ '../components/user/Others.vue')
 const Add = () => import(/* webpackChunkName: 'Add' */ '../components/contents/Add.vue')
-const Detail = () => import(/* webpackChunkName: 'Add' */ '../components/contents/Detail.vue')
+const Edit = () => import(/* webpackChunkName: 'Edit' */ '../components/contents/Edit.vue')
+const Detail = () => import(/* webpackChunkName: 'Detail' */ '../components/contents/Detail.vue')
 const NotFound = () => import(/* webpackChunkName: 'NotFound' */ '../views/404.vue')
 
 Vue.use(VueRouter)
@@ -77,7 +78,41 @@ const routes = [
   {
     path: '/add',
     name: 'Add',
-    component: Add
+    component: Add,
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
+    path: '/edit/:tid',
+    props: true,
+    name: 'Edit',
+    component: Edit,
+    meta: {
+      requireAuth: true
+    },
+    // 防止恶意tiaozhuan
+    beforeEnter (to, from, next) {
+      // 从详情页或我发表的帖子跳转
+      if (['Detail', 'MyPost'].indexOf(from.name) !== -1 && to.params.page && to.params.page.isEnd === '0') {
+        next()
+      } else {
+        const editData = localStorage.getItem('editData')
+        // 有缓存，编辑页面刷新
+        if (editData && editData !== '') {
+          const editObj = JSON.parse(editData)
+          if (editObj.isEnd === '0') {
+            next()
+            // 已结贴
+          } else {
+            next('/')
+          }
+          // 无缓存
+        } else {
+          next('/')
+        }
+      }
+    }
   },
   {
     path: '/detail',
