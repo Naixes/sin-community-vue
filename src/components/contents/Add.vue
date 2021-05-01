@@ -142,7 +142,7 @@
 <script>
 import { addPost } from '@/api/content'
 import CodeMix from '@/mixin/code'
-import Editor from '../modules/editor/Index'
+import Editor from '../modules/Editor/Index'
 export default {
   name: 'add',
   mixins: [CodeMix],

@@ -106,7 +106,7 @@
 <script>
 import { updatePost } from '@/api/content'
 import CodeMix from '@/mixin/code'
-import Editor from '../modules/editor/Index'
+import Editor from '../modules/Editor/Index'
 export default {
   name: 'Edit',
   props: ['tid', 'page'],

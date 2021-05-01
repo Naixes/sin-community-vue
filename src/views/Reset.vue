@@ -113,7 +113,7 @@
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
 import { getCode, reset } from '@/api/login'
 import { getParam } from '@/utils/common'
-import uuid from 'uuid/v4'
+import { v4 as uuidv4 } from 'uuid'
 export default {
   name: 'reset',
   components: {
@@ -134,7 +134,7 @@ export default {
     if (localStorage.getItem('sid')) {
       sid = localStorage.getItem('sid')
     } else {
-      sid = uuid()
+      sid = uuidv4()
       localStorage.setItem('sid', sid)
     }
     this.$store.commit('setSid', sid)

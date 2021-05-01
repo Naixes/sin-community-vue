@@ -74,7 +74,7 @@
 
 <script>
 import { getPostListByUid, deletePostByUid } from '@/api/user'
-import Pagination from '@/components/modules/pagination/Index'
+import Pagination from '@/components/modules/Pagination/Index'
 export default {
   name: 'my-post',
   components: {

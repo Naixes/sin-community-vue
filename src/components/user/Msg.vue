@@ -42,7 +42,7 @@
 <script>
 import { mapState } from 'vuex'
 import { getMsg, setMsg } from '@/api/user'
-import Pagination from '@/components/modules/pagination/Index'
+import Pagination from '@/components/modules/Pagination/Index'
 export default {
   name: 'user-msg',
   components: {
