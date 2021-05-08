@@ -2927,30 +2927,491 @@ Chrome 调试：使用Debugger
 >
 > 前端数据接口管理工具：doclever
 
-## 业务逻辑
+## 消息通知
 
-### 前端
+### websocket
 
-#### 数据库设计
+一种网络传输协议，可在单个TCP连接上惊醒**双全工**通信，位于OSI模型的应用层
 
-用户信息表
+特点
 
-发帖信息
+- TCP连接，与HTTP兼容
+- 双向通信，主动推送（服务端向客户端）
+- 无同源限制，协议标识符是ws（加密wss）
 
-##### 组件化
+<img src="note.assets/截屏2021-05-01 下午7.28.51.png" alt="截屏2021-05-01 下午7.28.51" style="zoom:50%;" />
 
-> Seo：搜索引擎优化
+
+
+场景：
+
+- 聊天消息点赞
+- 直播评论，弹幕
+- 游戏，协同编辑，基于位置的应用
+
+常用API
+
+事件：onopen，onmessage，onerror，onclose（client侧事件）
+
+状态：
+
+readyState，CONNECTING-0，OPEN-1，CLOSING-2，CLOSED-3
+
+bufferedAmount（传输过程中对发送数据的计数，针对还没有发送的数据，递减）
+
+url
+
+protocol
+
+方法：close，send
+
+#### 集成ws
+
+server：
+
+- socket.io（向下兼容协议，不支持websocket的浏览器使用ajax，适配性强，性能一般）
+
+- ws（实现原生协议，通用，性能高，定制性强）
+
+> caniuse
+
+client：（浏览器已经集成了websocket）
+
+场景判断
+
+应用面及性能
+
+#### 使用
+
+##### 基本通信
+
+```js
+// socketio
+// client
+$(function () {
+	var i = 0
+	var socket = io.connect('http://localhost:3000')
+	socket.on('open', function () {
+		console.log('已连接')
+		socket.send('连接成功')
+	})
+	// 接收服务端发送到test的消息
+	socket.on('test', function (msg) {
+		console.log('test', msg)
+	})
+	socket.on('system', function () { })
+
+	// 简单聊天室：点击发送input中的消息
+	$('#btn').on('click', () => {
+		const value = $('#msg').val()
+		socket.emit('chatEvent', value)
+		$('#msg').val('')
+	})
+	socket.on('ServerMsg', function (msg) {
+		console.log('msg', msg);
+	})
+})
+// server
+var path = require('path')
+var logger = require('morgan')
+var express = require('express')
+
+var app = express()
+var server = require('http').createServer(app)
+var io = require('socket.io').listen(server)
+
+app.set('port', process.env.PORT || 3000)
+
+app.use(logger('dev'))
+app.use(express.static(path.join(__dirname, 'public')))
+
+// websocket连接监听
+io.on("connection", function (socket) {
+	socket.emit('open')
+	console.log(socket.handshake)
+	// 接收客户端的消息
+	socket.on('message', function (msg) {
+		console.log(msg)
+		// 向客户端发送消息，频道为test
+		socket.emit('test', 'server ready')
+		// 广播
+		socket.broadcast.emit('test', 'server ready')
+	})
+	socket.on('disconnect', function () { })
+
+	// 简单聊天室
+	socket.on('chatEvent', (msg) => {
+		console.log('app', msg);
+		// 广播：自己不会收到
+		socket.broadcast.emit('ServerMsg', msg)
+	})
+})
+
+app.get('/', function (req, res) {
+	res.sendFile(path.resolve(__dirname, './views/index.html'))
+})
+
+server.listen(app.get('port'), function () {
+	console.log('server listening on port' + app.get('port'))
+})
+
+// module.exports = app;
+
+
+// ws
+// client
+
+```
+
+
+
+##### 鉴权
+
+`WebSocket(url[, protocols\])`(https://developer.mozilla.org/zh-CN/docs/Web/API/WebSocket/WebSocket)
+
+浏览器侧的websocket（client为浏览器）不能通过header进行鉴权，只能通过url/cookie和session（官方有express的案例）/message主动消息
+
+node侧的websoocket（client为node）可以使用header（ws库传递header，不能在浏览器端使用，会自动降级到http的websocket还是不能传递header）
+
+ws：
+
+Client authentication
+
+```js
+const http = require('http');
+const WebSocket = require('ws');
+
+const server = http.createServer();
+const wss = new WebSocket.Server({ noServer: true });
+
+wss.on('connection', function connection(ws, request, client) {
+  ws.on('message', function message(msg) {
+    console.log(`Received message ${msg} from user ${client}`);
+  });
+});
+
+server.on('upgrade', function upgrade(request, socket, head) {
+  // This function is not defined on purpose. Implement it with your own logic.
+  // authenticate(request, (err, client) => {
+    // if (err || !client) {
+      // socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      // socket.destroy();
+      // return;
+    // }
+
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      // wss.emit('connection', ws, request, client);
+      wss.emit('connection', ws, request);
+    });
+  // });
+});
+
+server.listen(8080);
+```
+
+Also see the provided [example](https://github.com/websockets/ws/blob/HEAD/examples/express-session-parse) using `express-session`.
+
+**总结**：
+
+协议本身在握手阶段不提供鉴权方案（不能自定义头部信息）
+
+浏览器侧只能通过url/cookie和session/message主动消息进行鉴权
+
+node侧通过ws传递headers进行鉴权
+
+#### 心跳检测
+
+判断客户端和服务端连接是否牢靠，双向过程
+
+服务端定时向客户端发送消息，客户端收到后返回消息
+
+#### 断线重连
+
+```js
+// server
+const WebSocket = require('ws')
+const http = require('http');
+const jwt = require('jsonwebtoken')
+
+const server = http.createServer();
+// const wss = new WebSocket.Server({port: 3000})
+const wss = new WebSocket.Server({ noServer: true });
+
+let num = 0
+let group = {}
+const heartbeatTime = 2000
+
+wss.on('connection', function connection(ws) {
+    // 初始化心跳检测
+    ws.isAlive = true
+
+    ws.on('message', function (msg) {
+        const msgObj = JSON.parse(msg)
+        // 判断客户端主动发送的鉴权消息
+        if(msgObj.type === 'auth') {
+            jwt.verify(msgObj.message, 'secret', (err, decode) => {
+                if(err) {
+                    ws.send({
+                        type: 'noauth',
+                        message: 'please auth again'
+                    })
+                    console.log('鉴权失败');
+                    return
+                }else {
+                    console.log(decode);
+                    ws.isAuth = true
+                    return
+                }
+            })
+            return
+        }
+        // 拦截未鉴权消息
+        if(!ws.isAuth) {
+            return
+        }
+        if(msgObj.type === 'enter') {
+            if(typeof group[msgObj.roomid] === 'undefined') {
+                group[msgObj.roomid] = 1
+            }else {
+                group[msgObj.roomid]++
+            }
+            ws.name = msgObj.name
+            ws.roomid = msgObj.roomid
+        }
+        // 心跳检测
+        if(msgObj.type === 'heartbeat' && msgObj.message === 'pong') {
+            ws.isAlive = true
+            return
+        }
+        // 广播消息
+        wss.clients.forEach(client => {
+            // 连接人数
+            // wss.clients.size
+            // 客户端需要过滤掉自己
+            if(client.readyState == WebSocket.OPEN && client.roomid === ws.roomid) {
+                msgObj.num = group[ws.roomid]
+                client.send(JSON.stringify(msgObj))
+            }
+        })
+    })
+    ws.on('close', function () {
+        if(ws.name) {
+            group[ws.roomid]--
+        }
+        wss.clients.forEach(client => {
+            if(client.readyState == WebSocket.OPEN && client.roomid === ws.roomid) {
+                const msgObj = {
+                    name: ws.name,
+                    num: group[ws.roomid],
+                    type: 'out'
+                }
+                client.send(JSON.stringify(msgObj))
+            }
+        })
+    })
+})
+
+server.on('upgrade', function upgrade(request, socket, head) {
+    // This function is not defined on purpose. Implement it with your own logic.
+    // authenticate(request, (err, client) => {
+    //     if (err || !client) {
+    //         socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+    //         socket.destroy();
+    //         return;
+    //     }
+
+        wss.handleUpgrade(request, socket, head, function done(ws) {
+        wss.emit('connection', ws, request);
+        });
+    // });
+});
+
+server.listen(3000);
+
+// 心跳检测
+setInterval(() => {
+    wss.clients.forEach(ws => {
+        if(!ws.isAlive && ws.roomid) {
+            group[ws.roomid]--
+            delete group['roomid']
+            return ws.terminate()
+        }
+        ws.isAlive = false
+        ws.send(JSON.stringify({
+            type: 'heartbeat',
+            message: 'ping',
+            num: group[ws.roomid]
+        }))
+    })
+}, heartbeatTime)
+
+// client
+<!DOCTYPE html>
+<html lang="en">
+<head>
+...
+</head>
+<body>
+...
+</body>
+<script>
+    const app = new Vue({
+        el: '#app',
+        data: {
+            ws: null,
+            msg: '',
+            list: [],
+            isEnter: false,
+            name: '',
+            num: 0,
+            roomid: '',
+            handler: {}
+        },
+        mounted() {
+        },
+        methods: {
+            // 超时重连
+            checkServer() {
+                const _this = this
+                // 如果没到时间收到了第二次请求就会清空上次定时器
+                clearTimeout(this.handler)
+                this.handler = setTimeout(() => {
+                    _this.onclose()
+                    setTimeout(() => {
+                        _this.init()
+                    }, 1000)
+                }, 2000 + 500)
+            },
+            init() {
+                // 建立连接
+                this.ws = new WebSocket('ws://192.168.0.101:3000')
+                this.ws.onopen = this.open
+                this.ws.onmessage = this.message
+                // 客户端主动断开连接：结束程序/ws.close()
+                this.ws.onclose = this.close
+                // 连接失败，比如服务器断开，先触发error再触发close
+                this.ws.onerror = this.error
+            },
+            // 进入聊天室
+            enter() {
+                if(this.name.trim() === '') {
+                    alert('请输入昵称')
+                    return 
+                }
+                // 建立连接
+                this.init()
+                this.isEnter = true
+            },
+            send() {
+                this.ws.send(JSON.stringify({
+                    type: 'message',
+                    message: this.msg,
+                    name: this.name,
+                    roomid: this.roomid
+                }))
+                this.list.push(`${this.name}：${this.msg}`)
+                this.msg = ''
+            },
+            open() {
+                console.log('onopen', this.ws.readyState); // 1
+                // 发起鉴权请求
+                this.ws.send(JSON.stringify({
+                    type: 'auth',
+                    message: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Im5haXhlcyIsImlhdCI6MTUxNjIzOTAyMn0.KK0yPOJtJN1AdNAPD0WvsRgcIGlJaLZfjP4DGcJhk_k'
+                }))
+                this.ws.send(JSON.stringify({
+                    type: 'enter',
+                    name: this.name,
+                    roomid: this.roomid
+                }))
+            },
+            message(e) {
+                // 进入之前不接收消息
+                if(!this.isEnter) {
+                    return
+                }
+                data = JSON.parse(e.data)
+
+                switch (data.type) {
+                    case 'heartbeat':
+                        this.checkServer()
+                        this.ws.send(JSON.stringify({
+                            type: 'heartbeat',
+                            message: 'pong'
+                        }))
+                        break;
+                    case 'noauth':
+                        // 鉴权失败，路由跳转，重新鉴权
+                        break;
+                    case 'enter':
+                        this.list.push(`欢迎${data.name}进入聊天室`)
+                        break;
+                    case 'out':
+                        this.list.push(`${data.name}：退出聊天室`)
+                        break;
+                    case 'message':
+                        if(data.name !== this.name) {
+                            this.list.push(`${data.name}：${data.message}`)
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                // if(data.type === 'noauth') {
+                //     // 鉴权失败，路由跳转，重新鉴权
+                // }
+                // if(data.type === 'enter') {
+                //     this.list.push(`欢迎${data.name}进入聊天室`)
+                // }else if(data.type === 'out') {
+                //     this.list.push(`${data.name}：退出聊天室`)
+                // }else if(data.type === 'message') {
+                //     if(data.name !== this.name) {
+                //         this.list.push(`${data.name}：${data.message}`)
+                //     }
+                // }
+                this.num = data.num
+                console.log('onmessage', this.ws.readyState); // 1
+            },
+            close() {
+                this.ws.close()
+                console.log('onclose', this.ws.readyState); // 3
+            },
+            error() {
+                const _this = this
+                this.handler = setTimeout(() => {
+                    _this.init()
+                }, 1000)
+                console.log('onerror', this.ws.readyState); // 3
+            }
+        },
+    })
+</script>
+</html>
+```
+
+> 包：
 >
-> 重要部分是网站的性能优化：
+> es5，reconnecting-websocket，https://github.com/joewalnes/reconnecting-websocket
 >
-> - 资源压缩，请求压缩
-> - 设置缓存，DNS预处理
-> - CDN
->
-> qs库：将对象转换为拼接字符串
+> es6，reconnecting-websocket，https://www.npmjs.com/package/reconnecting-websocket
 
-### 后端
+#### 离线消息缓存
 
-npm-check-updates：依赖包升级
+流程：
 
-移动端推荐dayjs代替monentjs（体积过大）
+<img src="note.assets/截屏2021-05-06 下午10.26.13.png" alt="截屏2021-05-06 下午10.26.13" style="zoom:50%;" />
+
+未读消息和历史消息，历史消息在移动端一般分两种，本地消息和数据库消息：
+
+redis
+
+包括房间信息和未读消息
+
+mongodb
+
+#### 聊天室
+
+参考项目：https://github.com/Naixes/demo-collection/tree/master/pushData/websocket-ws-demo%2Bchat
+
+#### 调试

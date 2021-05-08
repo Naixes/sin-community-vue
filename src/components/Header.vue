@@ -68,24 +68,52 @@
             <dd><a @click="logout" href="javascript: void(0)" style="text-align: center;">退出</a></dd>
             </dl>
         </li>
-
+        <div class="fly-nav-msg" v-show="num.message && num.message !== 0">{{num.message}}</div>
+        <transition name="fade">
+          <div class="layui-layer-tips" v-show="hasMsg">
+            <div class="layui-layer-content">
+              您有{{num.message}}条未读消息
+              <i class="layui-layer-TipsG layui-layer-TipsB"></i>
+            </div>
+          </div>
+        </transition>
       </ul>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   data () {
     return {
       isHover: false,
-      hoverControl: {}
+      hoverControl: {},
+      hasMsg: false
     }
   },
 
   components: {},
 
+  watch: {
+    num (newval, oldval) {
+      if (newval.type && newval !== oldval) {
+        // 判断消息数量
+        if (newval.message && newval.message > 0) {
+          this.hasMsg = true
+          setTimeout(() => {
+            this.hasMsg = false
+          }, 2000)
+        }
+      }
+    }
+  },
+
   computed: {
+    ...mapState({
+      num: (state) => state.num
+    }),
     isLogin () {
       return this.$store.state.isLogin
     },
@@ -129,5 +157,12 @@ export default {
 <style lang="scss" scoped>
 .logo-img {
   width: 40px;
+}
+.layui-layer-tips {
+  position: absolute;
+  white-space: nowrap;
+  right: 0;
+  top: 60px;
+  z-index: 2000;
 }
 </style>

@@ -14,6 +14,9 @@ const getPostListByUid = params => axios.get('/user/post?' + qs.stringify(params
 const deletePostByUid = params => axios.get('/user/deletePost?' + qs.stringify(params))
 // 获取用户信息
 const getInfo = (params) => axios.get('/user/info?' + qs.stringify(params))
+// 获取未读消息
+const getMsg = (params) => axios.get('/user/getmsg?' + qs.stringify(params))
+const setMsg = (params) => axios.set('/user/setmsg?' + qs.stringify(params))
 
 export {
   userSign,
@@ -24,5 +27,7 @@ export {
   getCollect,
   getPostListByUid,
   deletePostByUid,
-  getInfo
+  getInfo,
+  getMsg,
+  setMsg
 }
