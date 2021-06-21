@@ -121,9 +121,10 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { login, getCaptcha } from '@/api/login.js'
-import { v4 as uuidv4 } from 'uuid'
+import { login } from '@/api/login.js'
+import CodeMix from '@/mixin/code'
 export default {
+  mixins: [CodeMix],
   data () {
     return {
       svg: '',
@@ -134,10 +135,6 @@ export default {
   },
 
   components: { ValidationProvider, ValidationObserver },
-
-  mounted () {
-    this._getCaptcha()
-  },
 
   methods: {
     async submit () {
@@ -173,21 +170,6 @@ export default {
         } else if (res.code === 402) {
           // 验证码错误
           this.$refs.captchafield.setErrors([res.msg])
-        }
-      })
-    },
-    _getCaptcha () {
-      let sid = ''
-      if (localStorage.getItem('sid')) {
-        sid = localStorage.getItem('sid')
-      } else {
-        sid = uuidv4()
-        localStorage.setItem('sid', sid)
-      }
-      this.$store.commit('setSid', sid)
-      getCaptcha(sid).then((res) => {
-        if (res.code === 200) {
-          this.svg = res.data
         }
       })
     }

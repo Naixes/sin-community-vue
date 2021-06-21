@@ -23,7 +23,7 @@ Object.keys(filters).forEach(key => {
 
 // directives
 Object.keys(directives).forEach(key => {
-  Vue.directives(key, directives[key])
+  Vue.directive(key, directives[key])
 })
 
 Vue.config.productionTip = false

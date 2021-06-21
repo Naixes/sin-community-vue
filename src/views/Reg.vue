@@ -166,10 +166,11 @@
 
 <script>
 import { ValidationProvider, ValidationObserver } from 'vee-validate'
-import { reg, getCaptcha } from '@/api/login.js'
-import { v4 as uuidv4 } from 'uuid'
+import CodeMix from '@/mixin/code'
+import { reg } from '@/api/login.js'
 
 export default {
+  mixins: [CodeMix],
   data () {
     return {
       svg: '',
@@ -182,18 +183,6 @@ export default {
   },
 
   components: { ValidationProvider, ValidationObserver },
-
-  mounted () {
-    let sid = ''
-    if (localStorage.getItem('sid')) {
-      sid = localStorage.getItem('sid')
-    } else {
-      sid = uuidv4()
-      localStorage.setItem('sid', sid)
-    }
-    this.$store.commit('setSid', sid)
-    this._getCaptcha(sid)
-  },
 
   methods: {
     async submit () {
@@ -226,13 +215,6 @@ export default {
           }, 1000)
         } else {
           this.$refs.observer.setErrors(res.msg)
-        }
-      })
-    },
-    _getCaptcha (sid) {
-      getCaptcha(sid).then((res) => {
-        if (res.code === 200) {
-          this.svg = res.data
         }
       })
     }
